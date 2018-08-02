@@ -113,6 +113,15 @@ function receivedMessage(event) {
 
     if (messageText) {
         switch (messageText) {
+            case "!weathertoday":
+                sendTextMessage(senderID, "Weather Today");
+                break;
+            case "!weathertmrw":
+                sendTextMessage(senderID, "Weather Tomorrow");
+                break;
+            case "!weatherpop":
+                sendTextMessage(senderID, "Chance of Precipitation");
+                break;
             default:
                 sendTextMessage(senderID, messageText);
         }
