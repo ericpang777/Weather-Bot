@@ -1,7 +1,6 @@
 {
   "name": "messenger-webhook",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,7 +10,18 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "config": "^2.0.1",
     "express": "^4.16.3",
     "request": "^2.87.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericpang777/Weather-Bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ericpang777/Weather-Bot/issues"
+  },
+  "homepage": "https://github.com/ericpang777/Weather-Bot#readme",
+  "description": ""
 }
