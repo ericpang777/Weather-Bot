@@ -112,11 +112,8 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    console.log(messageText);
-    console.log(typeof messageText);
 
     if (messageText) {
-        /*
         var requestWeather = new XMLHttpRequest();
         if(messageText.includes("!wtoday")) {
             sendTextMessage(senderID, "Weather Today");
@@ -124,10 +121,9 @@ function receivedMessage(event) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
             sendTextMessage(senderID, messageText);
-        } */        
+        } /*
         switch (messageText) {
             case "!wtoday":
-
                 sendTextMessage(senderID, "Weather Today");
                 break;
             case "!wtmrw":
@@ -138,7 +134,7 @@ function receivedMessage(event) {
                 break;
             default:
                 sendTextMessage(senderID, messageText);
-        } 
+        }*/
     }
 }
 
