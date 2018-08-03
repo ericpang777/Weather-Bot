@@ -30,6 +30,8 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
+const OPEN_WEATHER_API_KEY = process.env.OPEN_WEATHER_API_KEY;
+
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
     process.exit(1);
@@ -112,19 +114,29 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
+        var requestWeather = new XMLHttpRequest();
+        if(messageText.includes("!wtoday")) {
+            sendTextMessage(senderID, "Weather Today");
+        } else if(messageText.includes("!wtmrw")) {
+            sendTextMessage(senderID, "Weather Tomorrow");
+        } else {
+            sendTextMessage(senderID, messageText);
+        }
+        /*
         switch (messageText) {
-            case "!weathertoday":
+            case "!wtoday":
+
                 sendTextMessage(senderID, "Weather Today");
                 break;
-            case "!weathertmrw":
+            case "!wtmrw":
                 sendTextMessage(senderID, "Weather Tomorrow");
                 break;
-            case "!weatherpop":
+            case "!wpop":
                 sendTextMessage(senderID, "Chance of Precipitation");
                 break;
             default:
                 sendTextMessage(senderID, messageText);
-        }
+        } */
     }
 }
 
