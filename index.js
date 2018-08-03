@@ -114,7 +114,6 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
-        var requestWeather = new XMLHttpRequest();
         if(messageText.includes("!wtoday")) {
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
