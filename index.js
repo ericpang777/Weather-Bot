@@ -6,7 +6,7 @@ const
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
-    XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+    XMLrequest = require('xmlhttprequest').XMLHttpRequest;
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -116,8 +116,9 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
-        var weatherRequest = new XMLHttpRequest();
+        //var weatherRequest = new XMLrequest();
         if(messageText.includes("!wtoday")) {
+          /*
             weatherRequest.open("GET", API_URL+"weather?q=toronto&APPID="+API_KEY, true);
             weatherRequest.onload = function() {
                 var data = JSON.parse(this.response);
@@ -130,6 +131,7 @@ function receivedMessage(event) {
                 }
             }
             weatherRequest.send();
+            */
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
