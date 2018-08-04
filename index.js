@@ -116,9 +116,8 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
-        //var weatherRequest = new XMLrequest();
+        var weatherRequest = new XMLrequest();
         if(messageText.includes("!wtoday")) {
-          /*
             weatherRequest.open("GET", API_URL+"weather?q=toronto&APPID="+API_KEY, true);
             weatherRequest.onload = function() {
                 var data = JSON.parse(this.response);
@@ -131,7 +130,6 @@ function receivedMessage(event) {
                 }
             }
             weatherRequest.send();
-            */
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
