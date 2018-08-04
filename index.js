@@ -120,14 +120,16 @@ function receivedMessage(event) {
         if(messageText.includes("!wtoday")) {
             weatherRequest.open("GET", API_URL+"weather?q=toronto&APPID="+API_KEY, true);
             weatherRequest.onload = function() {
-                var data = JSON.parse(this.response);
+                console.log(JSON.parse(this.response));
+                //var data = JSON.parse(this.response);
+                /*
                 if(weatherRequest >= 200 && weatherRequest.status < 400) {
                     data.forEach(stuff => {
                         console.log(stuff);
                     });
                 } else {
                     console.log("error");
-                }
+                } */
             }
             weatherRequest.send();
             sendTextMessage(senderID, "Weather Today");
