@@ -118,7 +118,7 @@ function receivedMessage(event) {
     if (messageText) {
         var weatherRequest = new XMLHttpRequest();
         if(messageText.includes("!wtoday")) {
-            weatherRequest.open("GET", API_URL+"weather?q=toronto&APPID="+API_KEY, true);
+            weatherRequest.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", true);
             weatherRequest.onload = function() {
                 console.log(JSON.stringify(this.response));
                 //var data = JSON.parse(this.response);
