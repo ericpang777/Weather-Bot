@@ -116,7 +116,7 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
-        var weatherRequest = new XMLrequest();
+        var weatherRequest = new XMLHttpRequest();
         if(messageText.includes("!wtoday")) {
             weatherRequest.open("GET", API_URL+"weather?q=toronto&APPID="+API_KEY, true);
             weatherRequest.onload = function() {
