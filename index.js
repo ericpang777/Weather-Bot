@@ -30,6 +30,8 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
+const OPEN_WEATHER_API_KEY = process.env.OPEN_WEATHER_API_KEY;
+
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
     process.exit(1);
