@@ -6,6 +6,7 @@ const
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
+    //XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest,
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -30,7 +31,9 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
-const OPEN_WEATHER_API_KEY = process.env.OPEN_WEATHER_API_KEY;
+const API_KEY = process.env.OPEN_WEATHER_API_KEY;
+const API_URL = "http://api.openweathermap.org/data/2.5/";
+
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
@@ -114,19 +117,38 @@ function receivedMessage(event) {
     var messageText = message.text;
 
     if (messageText) {
-        switch (messageText) {
-            case "!weathertoday":
-                sendTextMessage(senderID, "Weather Today");
-                break;
-            case "!weathertmrw":
-                sendTextMessage(senderID, "Weather Tomorrow");
-                break;
-            case "!weatherpop":
-                sendTextMessage(senderID, "Chance of Precipitation");
-                break;
-            default:
-                sendTextMessage(senderID, messageText);
-        }
+        //var weatherRequest = new XMLHttpRequest();
+        if(messageText.includes("!wtoday")) {
+            /*
+            weatherRequest.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", true);
+            weatherRequest.onload = function() {
+                console.log(JSON.stringify(this.response));
+                //var data = JSON.parse(this.response);
+                
+                if(weatherRequest >= 200 && weatherRequest.status < 400) {
+                    data.forEach(stuff => {
+                        console.log(stuff);
+                    });
+                } else {
+                    console.log("error");
+                } 
+            } 
+            weatherRequest.send(); */
+            request({url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", json: true}, function(error, response, body) {
+                body.main.forEach(function(data) {
+                    var measurement = {
+                        temp: data.temp,
+                        pressure: data.pressure
+                    };
+                    console.log(data);
+                })
+            }) 
+            sendTextMessage(senderID, "Weather Today");
+        } else if(messageText.includes("!wtmrw")) {
+            sendTextMessage(senderID, "Weather Tomorrow");
+        } else {
+            sendTextMessage(senderID, messageText);
+        } 
     }
 }
 
