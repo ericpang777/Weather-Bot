@@ -174,7 +174,30 @@ function sendTextMessage(recipientId, messageText) {
  *
  */
 function sendGetStarted(recipientId) {
-
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "button",
+                    text: "Hi, I'm Weather Bot! I can help with any of the requests below.",
+                    buttons: [{
+                        type: "postback",
+                        title: "Weather Today",
+                        event: "!wtoday"
+                    }, {
+                        type: "postback",
+                        title: "Weather Tomorrow",
+                        event: "!wtmrw"
+                    }]
+                }
+            }
+        }
+    };
+  callSendAPI(messageData);
 }
 
 /*
