@@ -34,6 +34,7 @@ const SERVER_URL = process.env.SERVER_URL;
 const API_KEY = process.env.OPEN_WEATHER_API_KEY;
 const API_URL = "http://api.openweathermap.org/data/2.5/";
 
+
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
     process.exit(1);
