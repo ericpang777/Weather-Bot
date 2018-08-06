@@ -113,7 +113,7 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-
+    var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             request.get({
@@ -125,9 +125,11 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
+                    weatherdata = data;
                     console.log(data.html_url);
                 }
             }); 
+            console.log(weatherdata);
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
