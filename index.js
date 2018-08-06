@@ -147,7 +147,13 @@ function receivedMessage(event) {
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
-            sendTextMessage(senderID, messageText);
+          
+            if(messageText.includes("get started")){
+              sendGetStarted(senderID);
+            }
+            else{
+               sendTextMessage(senderID, messageText);
+            }
         } 
     }
 }
