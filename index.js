@@ -178,7 +178,8 @@ function receivedPostback(event){
           sendGetStarted(senderID);
           break;
         case 'w_today':
-          sendTextMessage(senderID, "Weather Today");
+          sendGetStarted(senderID);
+          //sendTextMessage(senderID, "Weather Today");
           //receivedMessage(event);
           break;
         case 'w_tomorrow':
