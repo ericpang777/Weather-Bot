@@ -121,7 +121,7 @@ function receivedMessage(event) {
                 json: true
             }, (error, response, data) => {
                 if(error) {
-                    console.log("Error:" error);
+                    console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
