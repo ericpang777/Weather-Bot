@@ -144,16 +144,15 @@ function receivedMessage(event) {
                 })
             }) 
             sendTextMessage(senderID, "Weather Today");
-        } else if(messageText.includes("!wtmrw")) {
+          }
+        else if (messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
-        } else {
-          
-            if(messageText.includes("get started")){
-              sendGetStarted(senderID);
-            }
-            else{
-               sendTextMessage(senderID, messageText);
-            }
+          } 
+        else if (messageText.includes("get started")){
+            sendGetStarted(senderID);
+          } 
+        else {
+            sendTextMessage(senderID, messageText);
         } 
     }
 }
@@ -179,10 +178,10 @@ function receivedPostback(event){
           sendGetStarted(senderID);
           break;
         case 'w_today':
-          receivedMessage(senderID, "Weather Today");
+          receivedMessage(senderID, "!wtoday");
           break;
         case 'w_tomorrow':
-          receivedMessage(senderID, "Weather Tomorrow");
+          receivedMessage(senderID, "!wtmrw");
           break;
 
         default:
