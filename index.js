@@ -153,6 +153,39 @@ function receivedMessage(event) {
 }
 
 /*
+ * Postback Event
+ *
+ * This event is called when a postback is tapped on a Structured Message.
+ * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
+ *
+ */
+function receivedPostback(event){
+    var senderID = event.sender.id;
+    var recipientID = event.recipient.id;
+    var timeOfPostback = event.timestamp;
+    var payload = event.postback.payload;
+
+    console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
+
+    switch(payload){
+
+        case 'get_started':
+          sendGetStarted(senderID);
+          break;
+        case 'w_today':
+          receivedMessage(senderID, "Weather Today");
+          break;
+        case 'w_tomorrow':
+          receivedMessage(senderID, "Weather Tomorrow");
+          break;
+
+        default:
+          sendTextMessage(senderID, "Postback called");
+    }
+
+}
+
+/*
  * Send a text message using the Send API.
  *
  */
@@ -181,17 +214,18 @@ function sendGetStarted(recipientId) {
         message: {
             attachment: {
                 type: "template",
+
                 payload: {
                     template_type: "button",
-                    text: "Hi, I'm Weather Bot! I can help with any of the requests below.",
+                    text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
                     buttons: [{
                         type: "postback",
                         title: "Weather Today",
-                        event: "!wtoday"
+                        payload: "w_today"
                     }, {
                         type: "postback",
                         title: "Weather Tomorrow",
-                        event: "!wtmrw"
+                        payload: "w_tomorrow"
                     }]
                 }
             }
