@@ -178,10 +178,12 @@ function receivedPostback(event){
           sendGetStarted(senderID);
           break;
         case 'w_today':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Today");
+          //receivedMessage(event);
           break;
         case 'w_tomorrow':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Tomorrow");
+          //receivedMessage(event);
           break;
 
         default:
