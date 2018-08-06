@@ -153,7 +153,7 @@ function receivedMessage(event) {
           } 
         else {
             sendTextMessage(senderID, messageText);
-        } 
+          } 
     }
 }
 
@@ -178,10 +178,10 @@ function receivedPostback(event){
           sendGetStarted(senderID);
           break;
         case 'w_today':
-          receivedMessage(senderID, "!wtoday");
+          receivedMessage(event);
           break;
         case 'w_tomorrow':
-          receivedMessage(senderID, "!wtmrw");
+          receivedMessage(event);
           break;
 
         default:
