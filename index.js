@@ -130,7 +130,7 @@ function receivedMessage(event) {
             }); */
             axios.get("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135")
                 .then(response => {
-                    console.log(response.data.url);
+                    console.log(response.data.url.weather);
                     console.log(response.data.explanation);
                 })
                 .catch(error => {
