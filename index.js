@@ -117,25 +117,27 @@ function receivedMessage(event) {
     var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            /*
+            
             request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    weatherdata = data;
-                    console.log(data.url, "DATA URLLLLLLLLLLL");
+                    weatherdata = JSON.parse(data);
+                    console.log(weatherdata);
                 }
-            }); */
+            }); 
+            /*
             axios.get("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135")
                 .then(response => {
-                    console.log(response.data.url.weather);
+                    console.log(response.data.url);
                     console.log(response.data.explanation);
                 })
                 .catch(error => {
                     console.log(error);
                 });
+            */
             //console.log(weatherdata, "WEATHER DATAAAAA");
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
