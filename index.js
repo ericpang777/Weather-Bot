@@ -124,7 +124,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    weatherdata = JSON.parse(data);
+                    //weatherdata = JSON.parse(data);
                     console.log(data.name);
                 }
             }); 
