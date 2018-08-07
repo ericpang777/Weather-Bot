@@ -6,7 +6,6 @@ const
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
-    //XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest,
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -115,34 +114,23 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-
+    var weatherdata;
     if (messageText) {
-        //var weatherRequest = new XMLHttpRequest();
         if(messageText.includes("!wtoday")) {
-            /*
-            weatherRequest.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", true);
-            weatherRequest.onload = function() {
-                console.log(JSON.stringify(this.response));
-                //var data = JSON.parse(this.response);
-                
-                if(weatherRequest >= 200 && weatherRequest.status < 400) {
-                    data.forEach(stuff => {
-                        console.log(stuff);
-                    });
+            request.get({
+                url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
+                json: true
+            }, (error, response, data) => {
+                if(error) {
+                    console.log("Error:", error);
+                } else if(response.statusCode !== 200) {
+                    console.log("Status:", response.statusCode);
                 } else {
-                    console.log("error");
-                } 
-            } 
-            weatherRequest.send(); */
-            request({url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", json: true}, function(error, response, body) {
-                body.main.forEach(function(data) {
-                    var measurement = {
-                        temp: data.temp,
-                        pressure: data.pressure
-                    };
-                    console.log(data);
-                })
-            }) 
+                    weatherdata = data;
+                    console.log(data.html_url);
+                }
+            }); 
+            console.log(weatherdata);
             sendTextMessage(senderID, "Weather Today");
           }
         else if (messageText.includes("!wtmrw")) {
