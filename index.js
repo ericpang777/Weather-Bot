@@ -126,10 +126,10 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     weatherdata = data;
-                    console.log(data.url);
+                    console.log(data.url, "DATA URLLLLLLLLLLL");
                 }
             }); 
-            console.log(weatherdata);
+            console.log(weatherdata, "WEATHER DATAAAAA");
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
