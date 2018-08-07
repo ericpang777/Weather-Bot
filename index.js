@@ -132,7 +132,7 @@ function receivedMessage(event) {
                 }
                 
             });**/
-            request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
+            request("http://api.openweathermap.org/data/2.5/weather?id=1283240", 
                 {json:true},
                 (error, response, body) =>  { if(error) {
                     return console.log(error);
