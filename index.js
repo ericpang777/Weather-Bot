@@ -126,7 +126,7 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     weatherdata = data;
-                    console.log(data.html_url);
+                    console.log(data.url);
                 }
             }); 
             console.log(weatherdata);
