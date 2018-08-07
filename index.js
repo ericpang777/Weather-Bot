@@ -116,10 +116,7 @@ function receivedMessage(event) {
     var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            request.get({
-                url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
-                json: true
-            }, (error, response, data) => {
+            request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
