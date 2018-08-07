@@ -125,7 +125,7 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     weatherdata = JSON.parse(data);
-                    console.log(weatherdata);
+                    console.log(data.name);
                 }
             }); 
             /*
