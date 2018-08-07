@@ -174,17 +174,11 @@ function receivedPostback(event){
 
     switch(payload){
 
-        case 'get_started':
-          sendGetStarted(senderID);
-          break;
         case 'w_today':
-          sendGetStarted(senderID);
-          //sendTextMessage(senderID, "Weather Today");
-          //receivedMessage(event);
+          receivedMessage(event);
           break;
         case 'w_tomorrow':
-          sendTextMessage(senderID, "Weather Tomorrow");
-          //receivedMessage(event);
+          receivedMessage(event);
           break;
 
         default:
