@@ -117,7 +117,7 @@ function receivedMessage(event) {
     var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            request.get({
+            /**request.get({
                 url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
                 json: true
             }, (error, response, data) => {
@@ -128,20 +128,31 @@ function receivedMessage(event) {
                 } else {
                     weatherdata = data;
                     console.log(data.html_url);
+                
                 }
-            }); 
+                
+            });**/
+            request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
+                {json:true},
+                (error, response, body) =>  { if(error) {
+                    return console.log(error);
+                }
+                console.log(body.url);
+                console.log(body.explaination);
+                }
+            ); 
             console.log(weatherdata);
             sendTextMessage(senderID, "Weather Today");
-          }
+        }
         else if (messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
-          } 
+        } 
         else if (messageText.includes("get started")){
             sendGetStarted(senderID);
-          } 
+        } 
         else {
             sendTextMessage(senderID, messageText);
-          } 
+        } 
     }
 }
 
