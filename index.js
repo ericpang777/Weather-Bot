@@ -121,7 +121,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    temperature = Math.round(data.main.temp - 273.15);
+                    temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
                     console.log(temperature);
                     console.log(data.name);
                 }
