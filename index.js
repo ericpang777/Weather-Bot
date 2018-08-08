@@ -1,8 +1,6 @@
 'use strict';
 
 const
-    bodyParser = require('body-parser'),
-    config = require('config'),
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
@@ -30,7 +28,8 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
-const OPEN_WEATHER_API_KEY = process.env.OPEN_WEATHER_API_KEY;
+const API_KEY = process.env.OPEN_WEATHER_API_KEY;
+const API_URL = "http://api.openweathermap.org/data/2.5/";
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
@@ -112,21 +111,26 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-
     if (messageText) {
-        switch (messageText) {
-            case "!weathertoday":
-                sendTextMessage(senderID, "Weather Today");
-                break;
-            case "!weathertmrw":
-                sendTextMessage(senderID, "Weather Tomorrow");
-                break;
-            case "!weatherpop":
-                sendTextMessage(senderID, "Chance of Precipitation");
-                break;
-            default:
-                sendTextMessage(senderID, messageText);
-        }
+        if(messageText.includes("!wtoday")) {
+            var location = messageText.substring(messageText.indexOf(" ")+1);
+            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
+                if(error) {
+                    console.log("Error:", error);
+                } else if(response.statusCode !== 200) {
+                    console.log("Status:", response.statusCode);
+                } else {
+                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
+                    console.log(temperature);
+                    console.log(data.name);
+                    sendTextMessage(senderID, temperature.toString() + "°C");
+                }
+            }); 
+        } else if(messageText.includes("!wtmrw")) {
+            sendTextMessage(senderID, "Weather Tomorrow");
+        } else {
+            sendTextMessage(senderID, messageText);
+        } 
     }
 }
 
