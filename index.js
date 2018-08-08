@@ -111,7 +111,6 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    var temperature;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
@@ -121,7 +120,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
+                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
                     console.log(temperature);
                     console.log(data.name);
                     sendTextMessage(senderID, temperature.toString() + "°C");
