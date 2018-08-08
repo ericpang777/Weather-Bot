@@ -1,12 +1,9 @@
 'use strict';
 
 const
-    bodyParser = require('body-parser'),
-    config = require('config'),
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
-    axios = require('axios'),
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -114,31 +111,17 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            
             request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    //weatherdata = JSON.parse(data);
                     console.log(data.name);
                 }
             }); 
-            /*
-            axios.get("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135")
-                .then(response => {
-                    console.log(response.data.url);
-                    console.log(response.data.explanation);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-            */
-            //console.log(weatherdata, "WEATHER DATAAAAA");
             sendTextMessage(senderID, "Weather Today");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
