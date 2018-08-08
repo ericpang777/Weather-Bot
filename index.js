@@ -121,12 +121,12 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    temperature = data.main.temp - 273.15;
+                    temperature = Math.round(data.main.temp - 273.15);
                     console.log(temperature);
                     console.log(data.name);
                 }
             }); 
-            sendTextMessage(senderID, temperature + "°C");
+            sendTextMessage(senderID, temperature.toString() + "°C");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
