@@ -147,6 +147,8 @@ function receivedMessage(event) {
  *
  * This event is called when a postback is tapped on a Structured Message.
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
+ * 
+ * Returns weather based on input from get started menu
  *
  */
 function receivedPostback(event) {
@@ -158,7 +160,7 @@ function receivedPostback(event) {
     console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "Weather Today");
+          receivedMessage(event);
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
