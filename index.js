@@ -113,7 +113,8 @@ function receivedMessage(event) {
     var messageText = message.text;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            request("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", {json: true}, (error, response, data) => {
+            var location = messageText.substring(messageText.indexOf(" ")+1);
+            request(API_URL+"weather?q="+location+"&appid="+API_KEY, {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
