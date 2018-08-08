@@ -111,19 +111,22 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
+    var temperature;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
-            request(API_URL+"weather?q="+location+"&appid="+API_KEY, {json: true}, (error, response, data) => {
+            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
+                    temperature = data.main.temp - 273.15;
+                    console.log(temperature);
                     console.log(data.name);
                 }
             }); 
-            sendTextMessage(senderID, "Weather Today");
+            sendTextMessage(senderID, temperature + "°C");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
