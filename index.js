@@ -1,8 +1,6 @@
 'use strict';
 
 const
-    bodyParser = require('body-parser'),
-    config = require('config'),
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
@@ -75,6 +73,8 @@ app.post('/webhook', function (req, res) {
             pageEntry.messaging.forEach(function (messagingEvent) {
                 if (messagingEvent.message) {
                     receivedMessage(messagingEvent);
+                } else if (messagingEvent.postback) {
+                    receivedPostback(messagingEvent);
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
@@ -109,48 +109,34 @@ function receivedMessage(event) {
     var timeOfMessage = event.timestamp;
     var message = event.message;
 
+    var requestURL = "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135";
+
     console.log("Received message for user %d and page %d at %d with message:",
         senderID, recipientID, timeOfMessage);
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    var weatherdata;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            /**request.get({
-                url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
-                json: true
-            }, (error, response, data) => {
+            var location = messageText.substring(messageText.indexOf(" ")+1);
+            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    weatherdata = data;
-                    console.log(data.html_url);
-                
+                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
+                    console.log(temperature);
+                    console.log(data.name);
+                    sendTextMessage(senderID, temperature.toString() + "°C");
                 }
-                
-            });**/
-            request("http://api.openweathermap.org/data/2.5/weather?id=1283240", 
-                {json:true},
-                (error, response, body) =>  { if(error) {
-                    return console.log(error);
-                }
-                console.log(body.url);
-                console.log(body.explaination);
-                }
-            ); 
-            console.log(weatherdata);
-            sendTextMessage(senderID, "Weather Today");
-        }
-        else if (messageText.includes("!wtmrw")) {
+            }); 
+        } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } 
         else if (messageText.includes("get started")){
             sendGetStarted(senderID);
-        } 
-        else {
+        } else {
             sendTextMessage(senderID, messageText);
         } 
     }
@@ -163,23 +149,20 @@ function receivedMessage(event) {
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
  *
  */
-function receivedPostback(event){
+function receivedPostback(event) {
     var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
     console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
-
     switch(payload){
-
         case 'w_today':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Today");
           break;
         case 'w_tomorrow':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Tomorrow");
           break;
-
         default:
           sendTextMessage(senderID, "Postback called");
     }
@@ -215,7 +198,6 @@ function sendGetStarted(recipientId) {
         message: {
             attachment: {
                 type: "template",
-
                 payload: {
                     template_type: "button",
                     text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
