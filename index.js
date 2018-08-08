@@ -1,8 +1,6 @@
 'use strict';
 
 const
-    bodyParser = require('body-parser'),
-    config = require('config'),
     express = require('express'),
     request = require('request'),
     body_parser = require('body-parser'),
@@ -116,25 +114,22 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    var weatherdata;
-    var weather;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            
-            var request = new XMLHttpRequest();
-            request.open('GET', requestURL);
-            request.responseType = "json";
-            request.send();
-
-            request.onload = function(){
-                weatherdata = request.response;
-                weather = JSON.parse(weatherdata);
-            }
-
-            console.log(weather);
-            sendTextMessage(senderID, "Weather Today");
-        }
-        else if (messageText.includes("!wtmrw")) {
+            var location = messageText.substring(messageText.indexOf(" ")+1);
+            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
+                if(error) {
+                    console.log("Error:", error);
+                } else if(response.statusCode !== 200) {
+                    console.log("Status:", response.statusCode);
+                } else {
+                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
+                    console.log(temperature);
+                    console.log(data.name);
+                    sendTextMessage(senderID, temperature.toString() + "°C");
+                }
+            }); 
+        } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } 
         else if (messageText.includes("get started")){
