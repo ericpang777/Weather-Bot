@@ -73,6 +73,8 @@ app.post('/webhook', function (req, res) {
             pageEntry.messaging.forEach(function (messagingEvent) {
                 if (messagingEvent.message) {
                     receivedMessage(messagingEvent);
+                } else if (messagingEvent.postback) {
+                    receivedPostback(messagingEvent);
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
@@ -134,8 +136,7 @@ function receivedMessage(event) {
         } 
         else if (messageText.includes("get started")){
             sendGetStarted(senderID);
-        } 
-        else {
+        } else {
             sendTextMessage(senderID, messageText);
         } 
     }
@@ -148,23 +149,20 @@ function receivedMessage(event) {
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
  *
  */
-function receivedPostback(event){
+function receivedPostback(event) {
     var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
     console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
-
     switch(payload){
-
         case 'w_today':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Today");
           break;
         case 'w_tomorrow':
-          receivedMessage(event);
+          sendTextMessage(senderID, "Weather Tomorrow");
           break;
-
         default:
           sendTextMessage(senderID, "Postback called");
     }
@@ -200,7 +198,6 @@ function sendGetStarted(recipientId) {
         message: {
             attachment: {
                 type: "template",
-
                 payload: {
                     template_type: "button",
                     text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
