@@ -109,39 +109,29 @@ function receivedMessage(event) {
     var timeOfMessage = event.timestamp;
     var message = event.message;
 
+    var requestURL = "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135";
+
     console.log("Received message for user %d and page %d at %d with message:",
         senderID, recipientID, timeOfMessage);
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
     var weatherdata;
+    var weather;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            /**request.get({
-                url: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135", 
-                json: true
-            }, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    weatherdata = data;
-                    console.log(data.html_url);
-                
-                }
-                
-            });**/
-            request("http://api.openweathermap.org/data/2.5/weather?id=1283240", 
-                {json:true},
-                (error, response, body) =>  { if(error) {
-                    return console.log(error);
-                }
-                console.log(body.url);
-                console.log(body.explaination);
-                }
-            ); 
-            console.log(weatherdata);
+            
+            var request = new XMLHttpRequest();
+            request.open('GET', requestURL);
+            request.responseType = "json";
+            request.send();
+
+            request.onload = function(){
+                weatherdata = request.response;
+                weather = JSON.parse(weatherdata);
+            }
+
+            console.log(weather);
             sendTextMessage(senderID, "Weather Today");
         }
         else if (messageText.includes("!wtmrw")) {
