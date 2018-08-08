@@ -124,9 +124,9 @@ function receivedMessage(event) {
                     temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
                     console.log(temperature);
                     console.log(data.name);
+                    sendTextMessage(senderID, temperature.toString() + "°C");
                 }
             }); 
-            sendTextMessage(senderID, temperature.toString() + "°C");
         } else if(messageText.includes("!wtmrw")) {
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
