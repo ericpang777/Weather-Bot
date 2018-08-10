@@ -75,7 +75,8 @@ app.post('/webhook', function (req, res) {
                     receivedMessage(messagingEvent);
                 } else if (messagingEvent.postback) {
                     receivedPostback(messagingEvent);
-                } else {
+                } else if(messageEvent.)
+                 else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
             });
@@ -234,6 +235,10 @@ function sendWeather(recipientID, temperature){
                         {
                             title: "Temperature",
                             subtitle: temperature,
+                        },
+                        {
+                            title: "Precipitation"
+
                         }
                     ]
                 }
