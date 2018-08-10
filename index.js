@@ -128,7 +128,7 @@ function receivedMessage(event) {
                     var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
                     console.log(temperature);
                     console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");
+                    sendWeather(senderID, temperature.toString() + "°C");
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -160,7 +160,7 @@ function receivedPostback(event) {
     console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
     switch(payload){
         case 'w_today':
-          receivedMessage(event);
+          //receivedMessage(event);
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
@@ -202,7 +202,7 @@ function sendGetStarted(recipientId) {
                 type: "template",
                 payload: {
                     template_type: "button",
-                    text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
+                    text: "Hi {{user_first_name}}, I'm Weather Bot! Tap a forecast to view more information.",
                     buttons: [{
                         type: "postback",
                         title: "Weather Today",
@@ -217,6 +217,30 @@ function sendGetStarted(recipientId) {
         }
     };
   callSendAPI(messageData);
+}
+
+function sendWeather(recipientID, temperature){
+    var messageData = {
+        recipient: {
+            id: recipientID
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "list",
+                    top_element_style: "compact",
+                    elements: [
+                        {
+                            title: "Temperature",
+                            subtitle: temperature,
+                        }
+                    ]
+                }
+            }
+        }
+    };
+    callSendAPI(messageData);
 }
 
 /*
