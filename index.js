@@ -161,8 +161,9 @@ function getAfternoonTime(lat, long) {
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var cityTime = data.formatted;
-            var cityTimeTmrw = cityTime.split(" ")[0];
+            var cityTime = new Date(data.timestamp + data.gmtOffset);
+            var cityTimeTmrw = new Date();
+            cityTimeTmrw.setDate(cityTime.getDate() + 1);
             console.log(cityTime);
             console.log(cityTimeTmrw);
         }
