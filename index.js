@@ -75,7 +75,11 @@ app.post('/webhook', function (req, res) {
                     receivedMessage(messagingEvent);
                 } else if (messagingEvent.postback) {
                     receivedPostback(messagingEvent);
-                } else {
+                } 
+                // else if (there's an echoe event){
+                    
+                // } 
+                else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
             });
@@ -104,7 +108,7 @@ app.post('/webhook', function (req, res) {
  *
  */
 function receivedMessage(event) {
-    var senderID = event.sender.id;
+var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfMessage = event.timestamp;
     var message = event.message;
