@@ -127,11 +127,33 @@ function receivedMessage(event) {
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
+            var location = messageText.substring(messageText.indexOf(" ")+1);
+            request((API_URL+"forecast?q="+location+"&appid="+API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+                if(error) {
+                    console.log("Error:", error);
+                } else if(response.statusCode !== 200) {
+                    console.log("Status:", response.statusCode);
+                } else {
+                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
+                    console.log(temperature);
+                    console.log(data.name);
+                    sendTextMessage(senderID, temperature.toString() + "°C");
+                }
+            }); 
             sendTextMessage(senderID, "Weather Tomorrow");
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
+}
+
+/*
+ * Returns the number of 3 hour segments there are from current time to 2pm the next day.
+ */
+function getAfternoonTime(lat, long) {
+    var today = new Date();
+    var date = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + today.getDate();
+    console.log("date is " + date);
 }
 
 /*
