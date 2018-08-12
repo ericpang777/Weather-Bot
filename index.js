@@ -134,10 +134,12 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
+                    getAfternoonTime(data.city.coord.lat, data.city.coord.lon);
+                    /*
                     var temperature = Math.round(Number.parseFloat(data.main.temp)); 
                     console.log(temperature);
                     console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");
+                    sendTextMessage(senderID, temperature.toString() + "°C");*/
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
