@@ -123,13 +123,13 @@ var senderID = event.sender.id;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
+            request((API_URL+"weather?q="+location+"&appid="+API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
+                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
                     console.log(temperature);
                     console.log(data.name);
                     sendWeather(senderID, temperature.toString() + "°C");
