@@ -28,8 +28,10 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
-const API_KEY = process.env.OPEN_WEATHER_API_KEY;
-const API_URL = "http://api.openweathermap.org/data/2.5/";
+const WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/";
+const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
+const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
@@ -114,7 +116,7 @@ function receivedMessage(event) {
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((API_URL+"weather?q="+location+"&appid="+API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+            request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
@@ -128,7 +130,7 @@ function receivedMessage(event) {
             }); 
         } else if(messageText.includes("!wtmrw")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((API_URL+"forecast?q="+location+"&appid="+API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+            request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
                 if(error) {
                     console.log("Error:", error);
                 } else if(response.statusCode !== 200) {
@@ -153,9 +155,18 @@ function receivedMessage(event) {
  * Returns the number of 3 hour segments there are from current time to 2pm the next day.
  */
 function getAfternoonTime(lat, long) {
-    var today = new Date();
-    var date = today.getFullYear() + "-" + (today.getMonth()+1) + "-" + today.getDate();
-    console.log("date is " + date);
+    request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
+        if(error) {
+            console.log("Error:", error);
+        } else if(response.statusCode !== 200) {
+            console.log("Status:", response.statusCode);
+        } else {
+            var cityTime = data.formatted;
+            var cityTimeTmrw = cityTime.split(" ")[0];
+            console.log(cityTime);
+            console.log(cityTimeTmrw);
+        }
+    }); 
 }
 
 /*
