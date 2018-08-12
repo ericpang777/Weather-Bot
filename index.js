@@ -162,6 +162,8 @@ function getAfternoonTime(lat, long) {
             console.log("Status:", response.statusCode);
         } else {
             var cityTime = new Date(data.timestamp + data.gmtOffset);
+            console.log(data.timestamp);
+            console.log(data.gmtOffset);
             var cityTimeTmrw = new Date();
             cityTimeTmrw.setDate(cityTime.getDate() + 1);
             console.log(cityTime);
