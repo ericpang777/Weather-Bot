@@ -163,6 +163,7 @@ function getAfternoonTime(lat, long) {
         } else {
             var cityTime = new Date(data.timestamp);
             var cityTimeTmrw = new Date();
+            cityTimeTmrw.setDate(cityTime.getDate());
             cityTimeTmrw.setDate(cityTime.getDate() + 1);
             console.log(cityTime);
             console.log(cityTimeTmrw);
