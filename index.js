@@ -164,6 +164,7 @@ function getAfternoonTime(lat, long) {
             var cityTime = new Date(data.timestamp);
             var cityTimeTmrw = new Date();
             cityTimeTmrw.setDate(cityTime.getDate());
+            console.log(cityTime);
             cityTimeTmrw.setDate(cityTime.getDate() + 1);
             console.log(cityTime);
             console.log(cityTimeTmrw);
