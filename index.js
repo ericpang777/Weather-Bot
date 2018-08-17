@@ -1,5 +1,5 @@
 'use strict';
-
+// Imports dependencies and sets up http server
 const
     express = require('express'),
     request = require('request'),
@@ -10,7 +10,7 @@ const
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 /*
- * Be sure to setup your config values before running this code. You can
+ * Setup of configuration variables. You can
  * set them using environment variables or modifying the config file in /config.
  *
  */
@@ -61,7 +61,8 @@ app.get('/webhook', function (req, res) {
  * webhook. Be sure to subscribe your app to your page to receive callbacks
  * for your page.
  * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
- *
+ * 
+ * Accepts POST requests at /webhook endpoint
  */
 app.post('/webhook', function (req, res) {
     var data = req.body;
@@ -79,7 +80,7 @@ app.post('/webhook', function (req, res) {
                     receivedPostback(messagingEvent);
                 } 
                 // else if (there's an echoe event){
-                    
+                    //respond to the massage recieved by the page
                 // } 
                 else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
@@ -122,6 +123,7 @@ var senderID = event.sender.id;
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
+    //Can't we just do if(message.text)?
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
@@ -161,6 +163,36 @@ var senderID = event.sender.id;
             sendTextMessage(senderID, messageText);
         } 
     }
+    else if (message.attachment) {
+        let attachment_url = message.attachment[0].payload.url;
+        response = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": [{
+                        "title": "Title",
+                        "subtitle": "Subtitle",
+                        "image_url": attachment_url,
+                        "buttons": [
+                            {
+                                "type": "postback",
+                                "title": "Yes!",
+                                "payload": "yes",
+                            },
+                            {
+                                "type": "postback",
+                                "title": "No!",
+                                "payload": "no",
+                            },
+                        ]
+                    }]
+                }
+            }
+        }
+    }
+    //Send the response message
+    callSendAPI(message);
 }
 
 /*
@@ -178,7 +210,9 @@ function receivedPostback(event) {
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
-    console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", senderID, recipientID, payload, timeOfPostback);
+    console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", 
+    senderID, recipientID, payload, timeOfPostback);
+    
     switch(payload){
         case 'w_today':
           //receivedMessage(event);
@@ -189,7 +223,7 @@ function receivedPostback(event) {
         default:
           sendTextMessage(senderID, "Postback called");
     }
-
+}
  /* Returns the number of 3 hour segments there are from current time to 2pm the next day.
  */
 function getAfternoonTime(lat, long) {
