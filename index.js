@@ -161,8 +161,7 @@ function getAfternoonTime(lat, long) {
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var cityTime = new Date();
-            cityTime.setDate(data.timestamp);
+            var cityTime = new Date(data.timestamp);
             var cityTimeTmrw = new Date();
             cityTimeTmrw.setDate(cityTime.getDate());
             console.log(data.timestamp);
