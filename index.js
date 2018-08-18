@@ -130,19 +130,21 @@ var senderID = event.sender.id;
                     console.log("Status:", response.statusCode);
                 } else {
                     var temperature = Math.round(Number.parseFloat(data.main.temp));
-                    var cast = data.weather.0.main;
-                    var description = data.weather.0.description;
+                    var cast = data.weather.main;
+                    var condition = data.weather.description;
                     var humidity = Math.round(Number.parseFloat(data.main.humidity));
                     var wind = Math.round(Number.parseFloat(data.wind.speed));
 
                     console.log(temperature);
+                    console.log(cast);
+                    console.log(condition);
                     console.log(humidity);
                     console.log(wind);
                     console.log(data.name);
                     sendTextMessage(senderID, 
                                     "Current temperature: " + temperature.toString() + "°C" + 
-                                    "\n" + cast.toString() +
-                                    "\n" + description.toString() +
+                                    "\n" + cast +
+                                    "\n" + condition +
                                     "\n" + "Humidity: " + humidity.toString() + "%" + 
                                     "\n" + "Wind Speed: " +wind.toString() + " km/h");
                 }
