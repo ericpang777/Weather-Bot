@@ -146,8 +146,8 @@ var senderID = event.sender.id;
                                     "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
                                     "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
                     
-                    var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
-                    sendWeather(senderID, apiDat);
+                    //var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
+                    //sendWeather(senderID, apiDat);
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
