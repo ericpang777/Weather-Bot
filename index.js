@@ -130,6 +130,8 @@ var senderID = event.sender.id;
                     console.log("Status:", response.statusCode);
                 } else {
                     var temperature = Math.round(Number.parseFloat(data.main.temp));
+                    var cast = data.weather.0.main;
+                    var description = data.weather.0.description;
                     var humidity = Math.round(Number.parseFloat(data.main.humidity));
                     var wind = Math.round(Number.parseFloat(data.wind.speed));
 
@@ -137,7 +139,12 @@ var senderID = event.sender.id;
                     console.log(humidity);
                     console.log(wind);
                     console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C" + "\n" + humidity.toString() + "%" + "\n" + wind.toString() + " km/h");
+                    sendTextMessage(senderID, 
+                                    "Current temperature: " + temperature.toString() + "°C" + 
+                                    "\n" + cast.toString() +
+                                    "\n" + description.toString() +
+                                    "\n" + "Humidity: " + humidity.toString() + "%" + 
+                                    "\n" + "Wind Speed: " +wind.toString() + " km/h");
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
