@@ -130,19 +130,14 @@ var senderID = event.sender.id;
                     console.log("Status:", response.statusCode);
                 } else {
                     var temperature = Math.round(Number.parseFloat(data.main.temp));
-                    //var precip = Math.round(Number.parseFloat(data.));
                     var humidity = Math.round(Number.parseFloat(data.main.humidity));
                     var wind = Math.round(Number.parseFloat(data.wind.speed));
 
                     console.log(temperature);
-                    console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");
                     console.log(humidity);
-                    console.log(data.name);
-                    sendTextMessage(senderID, humidity.toString() + " %");
                     console.log(wind);
                     console.log(data.name);
-                    sendTextMessage(senderID, wind.toString() + " Km/H");
+                    sendTextMessage(senderID, temperature.toString() + "°C" + "\n" + humidity.toString() + "%" + "\n" + wind.toString() + " km/h");
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
