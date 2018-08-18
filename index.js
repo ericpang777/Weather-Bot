@@ -142,12 +142,12 @@ var senderID = event.sender.id;
                     console.log(humidity);
                     console.log(wind);
                     console.log(location);
-                    sendTextMessage(senderID, location + "\n" +
-                                    "Current temperature: " + temperature.toString() + "°C" + 
-                                    "\n" + cast +
-                                    "\n" + condition +
-                                    "\n" + "Humidity: " + humidity.toString() + "%" + 
-                                    "\n" + "Wind Speed: " +wind.toString() + " km/h");
+                    sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
+                                    "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+                                    "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
+                    
+                    var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
+                    sendWeather(senderID, apiDat);
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -304,7 +304,7 @@ function sendGetStarted(recipientId) {
   callSendAPI(messageData);
 }
 
-function sendWeather(recipientID, temperature){
+function sendWeather(recipientID, data){
     var messageData = {
         recipient: {
             id: recipientID
@@ -316,14 +316,10 @@ function sendWeather(recipientID, temperature){
                     template_type: "list",
                     top_element_style: "compact",
                     elements: [
-                        {
-                            title: "Temperature",
-                            subtitle: temperature,
-                        },
-                        {
-                            title: "Precipitation"
-
-                        }
+                        {title: data[0]},
+                        {title: "Temperature: " + data[1],},
+                        {title: "Humidity: " + data[2],},
+                        {title: "Wind Speed: " + data[3],}
                     ]
                 }
             }
