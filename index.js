@@ -136,7 +136,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    getAfternoonTime(data.city.coord.lat, data.city.coord.lon);
+                    getTempTmrw(data.city.coord.lat, data.city.coord.lon);
                     /*
                     var temperature = Math.round(Number.parseFloat(data.main.temp)); 
                     console.log(temperature);
@@ -152,20 +152,17 @@ function receivedMessage(event) {
 }
 
 /*
- * Returns the number of 3 hour segments there are from current time to 2pm the next day.
+ * Returns the highest temperature of the next day.
  */
-function getAfternoonTime(lat, long) {
+function getTempTmrw(lat, long) {
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var cityTime = new Date(data.timestamp);
+            var cityTime = new Date(data.timestamp*1000);
             var cityTimeTmrw = new Date();
-            cityTimeTmrw.setDate(cityTime.getDate());
-            console.log(data.timestamp);
-            console.log(cityTime);
             cityTimeTmrw.setDate(cityTime.getDate() + 1);
             console.log(cityTime);
             console.log(cityTimeTmrw);
