@@ -142,12 +142,12 @@ var senderID = event.sender.id;
                     console.log(humidity);
                     console.log(wind);
                     console.log(location);
-                    sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
-                                    "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
-                                    "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
-                    
-                    var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
-                    sendWeather(senderID, apiDat);
+                    sendTextMessage(senderID, location + "\n" +
+                                    "Current temperature: " + temperature.toString() + "°C" + 
+                                    "\n" + cast +
+                                    "\n" + condition +
+                                    "\n" + "Humidity: " + humidity.toString() + "%" + 
+                                    "\n" + "Wind Speed: " +wind.toString() + " km/h");
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -304,7 +304,7 @@ function sendGetStarted(recipientId) {
   callSendAPI(messageData);
 }
 
-function sendWeather(recipientID, data){
+function sendWeather(recipientID, temperature){
     var messageData = {
         recipient: {
             id: recipientID
@@ -316,10 +316,14 @@ function sendWeather(recipientID, data){
                     template_type: "list",
                     top_element_style: "compact",
                     elements: [
-                        {title: data[0]},
-                        {title: "Temperature: " + data[1],},
-                        {title: "Humidity: " + data[2],},
-                        {title: "Wind Speed: " + data[3],}
+                        {
+                            title: "Temperature",
+                            subtitle: temperature,
+                        },
+                        {
+                            title: "Precipitation"
+
+                        }
                     ]
                 }
             }
