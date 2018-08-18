@@ -129,6 +129,7 @@ var senderID = event.sender.id;
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
+                    var location = data.name + ", " + data.sys.country;
                     var temperature = Math.round(Number.parseFloat(data.main.temp));
                     var cast = data.weather[0].main;
                     var condition = data.weather[0].description;
@@ -140,8 +141,8 @@ var senderID = event.sender.id;
                     console.log(condition);
                     console.log(humidity);
                     console.log(wind);
-                    console.log(data.name);
-                    sendTextMessage(senderID, 
+                    console.log(location);
+                    sendTextMessage(senderID, location + "\n" +
                                     "Current temperature: " + temperature.toString() + "°C" + 
                                     "\n" + cast +
                                     "\n" + condition +
