@@ -55,7 +55,6 @@ app.get('/webhook', function (req, res) {
     }
 });
 
-
 /*
  * All callbacks for Messenger are POST-ed. They will be sent to the same
  * webhook. Be sure to subscribe your app to your page to receive callbacks
@@ -83,7 +82,6 @@ app.post('/webhook', function (req, res) {
                 }
             });
         });
-
         // Assume all went well.
         //
         // You must send back a 200, within 20 seconds, to let us know you've
@@ -226,7 +224,7 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "Weather Today");
+          sendTextMessage(senderID, "!wtoday toronto");
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
