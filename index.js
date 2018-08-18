@@ -137,7 +137,7 @@ var senderID = event.sender.id;
                     console.log(temperature);
                     console.log(data.name);
                     sendTextMessage(senderID, temperature.toString() + "°C");
-                    console.log(humidity;
+                    console.log(humidity);
                     console.log(data.name);
                     sendTextMessage(senderID, humidity.toString() + " %");
                     console.log(wind);
