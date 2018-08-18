@@ -78,11 +78,7 @@ app.post('/webhook', function (req, res) {
                     receivedMessage(messagingEvent);
                 } else if (messagingEvent.postback) {
                     receivedPostback(messagingEvent);
-                } 
-                // else if (there's an echoe event){
-                    //respond to the massage recieved by the page
-                // } 
-                else {
+                } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
             });
@@ -133,10 +129,20 @@ var senderID = event.sender.id;
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
+                    var temperature = Math.round(Number.parseFloat(data.main.temp));
+                    //var precip = Math.round(Number.parseFloat(data.));
+                    var humidity = Math.round(Number.parseFloat(data.main.humidity));
+                    var wind = Math.round(Number.parseFloat(data.wind.speed));
+
                     console.log(temperature);
                     console.log(data.name);
-                    sendWeather(senderID, temperature.toString() + "°C");
+                    sendTextMessage(senderID, temperature.toString() + "°C");
+                    console.log(humidity;
+                    console.log(data.name);
+                    sendTextMessage(senderID, humidity.toString() + " %");
+                    console.log(wind);
+                    console.log(data.name);
+                    sendTextMessage(senderID, wind.toString() + " Km/H");
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -163,8 +169,8 @@ var senderID = event.sender.id;
             sendTextMessage(senderID, messageText);
         } 
     }
-    else if (message.attachment) {
-        let attachment_url = message.attachment[0].payload.url;
+    /**else if (message.attachment) {
+        let attachment_url;
         response = {
             "attachment": {
                 "type": "template",
@@ -190,7 +196,7 @@ var senderID = event.sender.id;
                 }
             }
         }
-    }
+    }**/
     //Send the response message
     callSendAPI(message);
 }
@@ -215,7 +221,7 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-          //receivedMessage(event);
+          sendTextMessage(senderID, "Weather Today");
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
@@ -276,7 +282,7 @@ function sendGetStarted(recipientId) {
                 type: "template",
                 payload: {
                     template_type: "button",
-                    text: "Hi {{user_first_name}}, I'm Weather Bot! Tap a forecast to view more information.",
+                    text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
                     buttons: [{
                         type: "postback",
                         title: "Weather Today",
