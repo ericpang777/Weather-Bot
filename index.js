@@ -55,7 +55,6 @@ app.get('/webhook', function (req, res) {
     }
 });
 
-
 /*
  * All callbacks for Messenger are POST-ed. They will be sent to the same
  * webhook. Be sure to subscribe your app to your page to receive callbacks
@@ -83,7 +82,6 @@ app.post('/webhook', function (req, res) {
                 }
             });
         });
-
         // Assume all went well.
         //
         // You must send back a 200, within 20 seconds, to let us know you've
@@ -142,12 +140,13 @@ var senderID = event.sender.id;
                     console.log(humidity);
                     console.log(wind);
                     console.log(location);
-                    sendTextMessage(senderID, location + "\n" +
-                                    "Current temperature: " + temperature.toString() + "°C" + 
-                                    "\n" + cast +
-                                    "\n" + condition +
-                                    "\n" + "Humidity: " + humidity.toString() + "%" + 
-                                    "\n" + "Wind Speed: " +wind.toString() + " km/h");
+
+                    sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
+                                    "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+                                    "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
+                    
+                    //var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
+                    //sendWeather(senderID, apiDat);
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -226,7 +225,7 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "Weather Today");
+          sendTextMessage(senderID, "!wtoday toronto");
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
