@@ -119,7 +119,7 @@ var senderID = event.sender.id;
     var messageText = message.text;
     //Can't we just do if(message.text)?
     if (messageText) {
-        if(messageText.includes("!wtoday")) {
+        if(messageText.includes("!wtoday") || messageText.includes("Weather Today")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
             request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
                 if(error) {
@@ -225,7 +225,7 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "!wtoday toronto");
+          sendTextMessage(senderID, "Current weather");
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
