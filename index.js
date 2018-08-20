@@ -136,12 +136,17 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    getTempTmrw(data.city.coord.lat, data.city.coord.lon);
-                    /*
-                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
-                    console.log(temperature);
-                    console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");*/
+                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    var maxTemp = -89;
+                    for(i = 0; i < 8; i++) {
+                        if(data.list[index+i].main.temp > maxTemp) {
+                            maxTemp = data.list[index+i].main.temp;
+                            console.log(data.list[index+i].main.temp);
+                        }
+                    }
+                    maxTemp = Math.round(maxTemp); 
+                    console.log(maxTemp);
+                    sendTextMessage(senderID, maxTemp.toString() + "°C");
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
@@ -152,20 +157,29 @@ function receivedMessage(event) {
 }
 
 /*
- * Returns the highest temperature of the next day.
+ * Returns the index to get temperatures of the next day.
  */
-function getTempTmrw(lat, long) {
+function getForecastArrayIndex(lat, long) {
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var cityTime = new Date(data.timestamp*1000);
-            var cityTimeTmrw = new Date();
-            cityTimeTmrw.setDate(cityTime.getDate() + 1);
+            var cityTime = new Date(data.timestamp * 1000);
+            var cityTimeTmrw = new Date(data.timestamp * 1000);
+            cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            var hoursToMidnight = timeToMidnight / (1000*60*60);
+            var arrayIndex = Math.round(hoursToMidnight / 3);
             console.log(cityTime);
             console.log(cityTimeTmrw);
+            console.log(midnightTime);
+            console.log(timeToMidnight);
+            console.log(hoursToMidnight);
+            console.log(arrayIndexesNeeded);
+            return arrayIndex;
         }
     }); 
 }
