@@ -136,7 +136,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
                     console.log("index in else if = ", index);
                     if(index !== -1) {
                         console.log(index);
