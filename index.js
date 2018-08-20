@@ -181,7 +181,7 @@ function getForecastArrayIndex(lat, long) {
             console.log(midnightTime);
             console.log(timeToMidnight);
             console.log(hoursToMidnight);
-            console.log(arrayIndexesNeeded);
+            console.log(arrayIndex);
             return arrayIndex;
         }
     }); 
