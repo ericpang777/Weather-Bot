@@ -181,12 +181,20 @@ function getForecastArrayIndex(lat, long) {
         } else {
             console.log("Fetching timezone api");
             var cityTime = new Date(data.timestamp * 1000);
+            console.log(cityTime);
             var cityTimeTmrw = new Date(data.timestamp * 1000);
+            console.log(cityTimeTmrw);
             cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            console.log(cityTimeTmrw);
             var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log(midnightTime);
             var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            console.log(timeToMidnight);
             var hoursToMidnight = timeToMidnight / (1000*60*60);
+            console.log(hoursToMidnight);
             arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log(arrayIndex);
+            
         }
     }); 
     console.log("arrayIndex = ", arrayIndex);
