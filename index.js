@@ -138,9 +138,8 @@ function receivedMessage(event) {
                 } else {
                     var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon));
                     var maxTemp = -100; 
-                    var i = 0;
-                    for(i = 0; i < 8; i++) {
-                        console.log(index+i);
+                    for(var i = 0; i < 8; i++) {
+                        console.log("Index+i = ", index+i);
                         if(data.list[index+i].main.temp > maxTemp) {
                             maxTemp = data.list[index+i].main.temp;
                             console.log(data.list[index+i].main.temp);
@@ -174,7 +173,7 @@ function getForecastArrayIndex(lat, long) {
             var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
             var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
             var hoursToMidnight = timeToMidnight / (1000*60*60);
-            var arrayIndex = Math.round(hoursToMidnight / 3);
+            var arrayIndex = Math.floor(hoursToMidnight / 3);
             return arrayIndex;
         }
     }); 
