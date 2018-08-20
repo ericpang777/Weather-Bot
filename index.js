@@ -139,7 +139,7 @@ function receivedMessage(event) {
                     var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
                     
                     console.log("index in else if = ", index);
-                    /*if(index !== -1) {
+                    if(index !== -1) {
                         console.log(index);
                         var maxTemp = -100; 
                         for(var i = 0; i < 8; i++) {
@@ -155,7 +155,7 @@ function receivedMessage(event) {
                         sendTextMessage(senderID, maxTemp.toString() + "°C");
                     } else {
                         sendTextMessage(senderID, "Could not find weather");
-                    }*/
+                    }
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
@@ -193,8 +193,7 @@ function getForecastArrayIndex(lat, long) {
             var hoursToMidnight = timeToMidnight / (1000*60*60);
             console.log(hoursToMidnight);
             arrayIndex = Math.floor(hoursToMidnight / 3);
-            console.log(arrayIndex);
-            
+            console.log(arrayIndex);        
         }
     }); 
     console.log("arrayIndex = ", arrayIndex);
