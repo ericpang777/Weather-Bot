@@ -76,7 +76,7 @@ app.post('/webhook', function (req, res) {
                 if (messagingEvent.message) {
                     receivedMessage(messagingEvent);
                 } else if (messagingEvent.postback) {
-                    receivedMessage(messagingEvent);
+                    receivedPostback(messagingEvent);
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
@@ -117,6 +117,7 @@ var senderID = event.sender.id;
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
+    var postback = message.postback;
     //Can't we just do if(message.text)?
     if (messageText) {
         if(messageText.includes("!wtoday") || messageText.includes("Weather Today")) {
@@ -145,8 +146,6 @@ var senderID = event.sender.id;
                                     "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
                                     "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
                     
-                    //var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
-                    //sendWeather(senderID, apiDat);
                 }
             }); 
         } else if(messageText.includes("!wtmrw")) {
@@ -173,34 +172,12 @@ var senderID = event.sender.id;
             sendTextMessage(senderID, messageText);
         } 
     }
-    /**else if (message.attachment) {
-        let attachment_url;
-        response = {
-            "attachment": {
-                "type": "template",
-                "payload": {
-                    "template_type": "generic",
-                    "elements": [{
-                        "title": "Title",
-                        "subtitle": "Subtitle",
-                        "image_url": attachment_url,
-                        "buttons": [
-                            {
-                                "type": "postback",
-                                "title": "Yes!",
-                                "payload": "yes",
-                            },
-                            {
-                                "type": "postback",
-                                "title": "No!",
-                                "payload": "no",
-                            },
-                        ]
-                    }]
-                }
-            }
-        }
-    }**/
+    else if(postback){
+        console.log("Recieved postback event");
+    }
+    else{
+        console.log("Undefined message contents");
+    }
     //Send the response message
     callSendAPI(message);
 }
@@ -220,12 +197,12 @@ function receivedPostback(event) {
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
-    console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", 
+    console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
     
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "Current weather");
+            
           break;
         case 'w_tomorrow':
           sendTextMessage(senderID, "Weather Tomorrow");
@@ -273,8 +250,8 @@ function sendTextMessage(recipientId, messageText) {
 }
 
 /*
- * Send a button message using the Send API.
- *
+ * Get started menu message
+ * Sends postback requests to webhook
  */
 function sendGetStarted(recipientId) {
     var messageData = {
@@ -303,29 +280,13 @@ function sendGetStarted(recipientId) {
   callSendAPI(messageData);
 }
 
-function sendWeather(recipientID, temperature){
+function sendWeather(recipientID, location, time){
     var messageData = {
         recipient: {
             id: recipientID
         },
         message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "list",
-                    top_element_style: "compact",
-                    elements: [
-                        {
-                            title: "Temperature",
-                            subtitle: temperature,
-                        },
-                        {
-                            title: "Precipitation"
-
-                        }
-                    ]
-                }
-            }
+            //Weather based on location
         }
     };
     callSendAPI(messageData);
