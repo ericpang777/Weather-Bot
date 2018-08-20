@@ -136,9 +136,10 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    
                     console.log("index in else if = ", index);
-                    if(index !== -1) {
+                    /*if(index !== -1) {
                         console.log(index);
                         var maxTemp = -100; 
                         for(var i = 0; i < 8; i++) {
@@ -154,7 +155,7 @@ function receivedMessage(event) {
                         sendTextMessage(senderID, maxTemp.toString() + "°C");
                     } else {
                         sendTextMessage(senderID, "Could not find weather");
-                    }
+                    }*/
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
@@ -177,6 +178,7 @@ function getForecastArrayIndex(lat, long) {
             console.log("Status:", response.statusCode);
             arrayIndex = -1;
         } else {
+            console.log("Fetching timezone api");
             var cityTime = new Date(data.timestamp * 1000);
             var cityTimeTmrw = new Date(data.timestamp * 1000);
             cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
