@@ -137,8 +137,8 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon));
-                    var maxTemp = -89;
-                    var i;
+                    var maxTemp = -100; 
+                    var i = 0;
                     for(i = 0; i < 8; i++) {
                         console.log(index+i);
                         if(data.list[index+i].main.temp > maxTemp) {
