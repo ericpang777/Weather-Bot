@@ -137,19 +137,23 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
-                    console.log(index);
-                    var maxTemp = -100; 
-                    for(var i = 0; i < 8; i++) {
-                        var searchIndex = Number.parseInt(index) + Number.parseInt(i);
-                        console.log("Index+i = ", searchIndex);
-                        if(data.list[searchIndex].main.temp > maxTemp) {
-                            maxTemp = data.list[searchIndex].main.temp;
-                            console.log(data.list[searchIndex].main.temp);
+                    if(index !== -1) {
+                        console.log(index);
+                        var maxTemp = -100; 
+                        for(var i = 0; i < 8; i++) {
+                            var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                            console.log("Index+i = ", searchIndex);
+                            if(data.list[searchIndex].main.temp > maxTemp) {
+                                maxTemp = data.list[searchIndex].main.temp;
+                                console.log(data.list[searchIndex].main.temp);
+                            }
                         }
+                        maxTemp = Math.round(maxTemp); 
+                        console.log(maxTemp);
+                        sendTextMessage(senderID, maxTemp.toString() + "°C");
+                    } else {
+                        sendTextMessage(senderID, "Could not find weather");
                     }
-                    maxTemp = Math.round(maxTemp); 
-                    console.log(maxTemp);
-                    sendTextMessage(senderID, maxTemp.toString() + "°C");
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
@@ -166,8 +170,10 @@ function getForecastArrayIndex(lat, long) {
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
+            return -1;
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
+            return -1;
         } else {
             var cityTime = new Date(data.timestamp * 1000);
             var cityTimeTmrw = new Date(data.timestamp * 1000);
