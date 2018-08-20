@@ -136,11 +136,9 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
                     var maxTemp = -89;
                     var i;
-                    console.log(data.list[0].main.temp);
-                    
                     for(i = 0; i < 8; i++) {
                         if(data.list[index+i].main.temp > maxTemp) {
                             maxTemp = data.list[index+i].main.temp;
@@ -160,7 +158,7 @@ function receivedMessage(event) {
 }
 
 /*
- * Returns the index to get temperatures of the next day.
+ * Returns the array index number to get temperatures of the next day.
  */
 function getForecastArrayIndex(lat, long) {
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
@@ -176,12 +174,6 @@ function getForecastArrayIndex(lat, long) {
             var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
             var hoursToMidnight = timeToMidnight / (1000*60*60);
             var arrayIndex = Math.round(hoursToMidnight / 3);
-            console.log(cityTime);
-            console.log(cityTimeTmrw);
-            console.log(midnightTime);
-            console.log(timeToMidnight);
-            console.log(hoursToMidnight);
-            console.log(arrayIndex);
             return arrayIndex;
         }
     }); 
