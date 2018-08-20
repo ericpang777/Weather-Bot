@@ -140,6 +140,7 @@ function receivedMessage(event) {
                     var maxTemp = -89;
                     var i;
                     for(i = 0; i < 8; i++) {
+                        console.log(index+i);
                         if(data.list[index+i].main.temp > maxTemp) {
                             maxTemp = data.list[index+i].main.temp;
                             console.log(data.list[index+i].main.temp);
