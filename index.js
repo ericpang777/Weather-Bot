@@ -182,6 +182,7 @@ function getForecastArrayIndex(lat, long) {
             var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
             var hoursToMidnight = timeToMidnight / (1000*60*60);
             var arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log(arrayIndex);
             return arrayIndex;
         }
     }); 
