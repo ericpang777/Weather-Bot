@@ -137,6 +137,7 @@ function receivedMessage(event) {
                     console.log("Status:", response.statusCode);
                 } else {
                     var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    console.log(index);
                     var maxTemp = -100; 
                     for(var i = 0; i < 8; i++) {
                         var searchIndex = Number.parseInt(index) + Number.parseInt(i);
