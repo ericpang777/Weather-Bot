@@ -136,13 +136,14 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon));
+                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
                     var maxTemp = -100; 
                     for(var i = 0; i < 8; i++) {
-                        console.log("Index+i = ", index+i);
-                        if(data.list[index+i].main.temp > maxTemp) {
-                            maxTemp = data.list[index+i].main.temp;
-                            console.log(data.list[index+i].main.temp);
+                        var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                        console.log("Index+i = ", searchIndex);
+                        if(data.list[searchIndex].main.temp > maxTemp) {
+                            maxTemp = data.list[searchIndex].main.temp;
+                            console.log(data.list[searchIndex].main.temp);
                         }
                     }
                     maxTemp = Math.round(maxTemp); 
