@@ -136,7 +136,7 @@ function receivedMessage(event) {
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon));
                     var maxTemp = -89;
                     var i;
                     for(i = 0; i < 8; i++) {
