@@ -138,6 +138,7 @@ function receivedMessage(event) {
                 } else {
                     var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
                     var maxTemp = -89;
+                    var i;
                     for(i = 0; i < 8; i++) {
                         if(data.list[index+i].main.temp > maxTemp) {
                             maxTemp = data.list[index+i].main.temp;
