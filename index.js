@@ -156,18 +156,26 @@ var senderID = event.sender.id;
                 } else if(response.statusCode !== 200) {
                     console.log("Status:", response.statusCode);
                 } else {
-                    var index = Number.parseInt(getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon));
-                    var maxTemp = -89;
-                    for(var i = 0; i < 8; i++) {
-                        console.log(index+i);
-                        if(data.list[index+i].main.temp > maxTemp) {
-                            maxTemp = data.list[index+i].main.temp;
-                            console.log(data.list[index+i].main.temp);
+                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+                    
+                    console.log("index in else if = ", index);
+                    if(index !== -1) {
+                        console.log(index);
+                        var maxTemp = -100; 
+                        for(var i = 0; i < 8; i++) {
+                            var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                            console.log("Index+i = ", searchIndex);
+                            if(data.list[searchIndex].main.temp > maxTemp) {
+                                maxTemp = data.list[searchIndex].main.temp;
+                                console.log(data.list[searchIndex].main.temp);
+                            }
                         }
+                        maxTemp = Math.round(maxTemp); 
+                        console.log(maxTemp);
+                        sendTextMessage(senderID, maxTemp.toString() + "°C");
+                    } else {
+                        sendTextMessage(senderID, "Could not find weather");
                     }
-                    maxTemp = Math.round(maxTemp); 
-                    console.log(maxTemp);
-                    sendTextMessage(senderID, maxTemp.toString() + "°C");
                 }
             }); 
             sendTextMessage(senderID, "Weather Tomorrow");
@@ -221,22 +229,35 @@ function receivedPostback(event) {
  * Returns the array index number to get temperatures of the next day.
  */
 function getForecastArrayIndex(lat, long) {
+    var arrayIndex = -1;
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
+        console.log("in request");
         if(error) {
             console.log("Error:", error);
+            arrayIndex = -1;
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
+            arrayIndex = -1;
         } else {
+            console.log("Fetching timezone api");
             var cityTime = new Date(data.timestamp * 1000);
+            console.log(cityTime);
             var cityTimeTmrw = new Date(data.timestamp * 1000);
+            console.log(cityTimeTmrw);
             cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            console.log(cityTimeTmrw);
             var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log(midnightTime);
             var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            console.log(timeToMidnight);
             var hoursToMidnight = timeToMidnight / (1000*60*60);
-            var arrayIndex = Math.round(hoursToMidnight / 3);
-            return arrayIndex;
+            console.log(hoursToMidnight);
+            arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log(arrayIndex);        
         }
     }); 
+    console.log("arrayIndex = ", arrayIndex);
+    return arrayIndex;
 }
 
 /*
