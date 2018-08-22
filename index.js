@@ -147,7 +147,7 @@ function getWeatherToday(messageText, senderID) {
  */
 async function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
-    request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+    request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, async(error, response, data) => {
         if(error) {
             console.log("Error:", error);
         } else if(response.statusCode !== 200) {
