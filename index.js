@@ -145,7 +145,7 @@ async function getWeatherToday(messageText, senderID) {
 /*
  * Attempts to get the weather tomorrow from the location requested by the user.
  */
-function getWeatherTomorrow(messageText, senderID) {
+async function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
@@ -153,7 +153,7 @@ function getWeatherTomorrow(messageText, senderID) {
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+            var index = await getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
             console.log("index in else if = ", index);
             if(index !== -1) {
                 console.log(index);
@@ -179,7 +179,7 @@ function getWeatherTomorrow(messageText, senderID) {
 /*
  * Returns the array index number to get temperatures of the next day.
  */
-function getForecastArrayIndex(lat, long) {
+async function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
     request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
