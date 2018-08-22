@@ -130,35 +130,8 @@ function receivedMessage(event) {
             }); 
         } else if(messageText.includes("!wtmrw")) {
             var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
-                    
-                    console.log("index in else if = ", index);
-                    if(index !== -1) {
-                        console.log(index);
-                        var maxTemp = -100; 
-                        for(var i = 0; i < 8; i++) {
-                            var searchIndex = Number.parseInt(index) + Number.parseInt(i);
-                            console.log("Index+i = ", searchIndex);
-                            if(data.list[searchIndex].main.temp > maxTemp) {
-                                maxTemp = data.list[searchIndex].main.temp;
-                                console.log(data.list[searchIndex].main.temp);
-                            }
-                        }
-                        maxTemp = Math.round(maxTemp); 
-                        console.log(maxTemp);
-                        sendTextMessage(senderID, maxTemp.toString() + "°C");
-                    } else {
-                        sendTextMessage(senderID, "Could not find weather");
-                    }
-                }
-            }); 
-            sendTextMessage(senderID, "Weather Tomorrow");
+            getWeatherTomorrow(location);
+            
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -200,6 +173,35 @@ async function getForecastArrayIndex(lat, long) {
     return arrayIndex;
 }
 
+async function getWeatherTomorrow(location) {
+    await request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+        if(error) {
+            console.log("Error:", error);
+        } else if(response.statusCode !== 200) {
+            console.log("Status:", response.statusCode);
+        } else {
+            var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+            console.log("index in else if = ", index);
+            if(index !== -1) {
+                console.log(index);
+                var maxTemp = -100; 
+                for(var i = 0; i < 8; i++) {
+                    var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                    console.log("Index+i = ", searchIndex);
+                    if(data.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = data.list[searchIndex].main.temp;
+                        console.log(data.list[searchIndex].main.temp);
+                    }
+                }
+                maxTemp = Math.round(maxTemp); 
+                console.log(maxTemp);
+                sendTextMessage(senderID, maxTemp.toString() + "°C");
+            } else {
+                sendTextMessage(senderID, "Could not find weather");
+            }
+        }
+    }); 
+}
 /*
  * Send a text message using the Send API.
  *
