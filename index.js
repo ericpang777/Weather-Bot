@@ -168,9 +168,9 @@ function receivedMessage(event) {
 /*
  * Returns the array index number to get temperatures of the next day.
  */
-function getForecastArrayIndex(lat, long) {
+async function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
-    request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
+    await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
         if(error) {
             console.log("Error:", error);
