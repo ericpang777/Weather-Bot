@@ -54,7 +54,6 @@ app.get('/webhook', function (req, res) {
     }
 });
 
-
 /*
  * All callbacks for Messenger are POST-ed. They will be sent to the same
  * webhook. Be sure to subscribe your app to your page to receive callbacks
@@ -115,23 +114,9 @@ function receivedMessage(event) {
     var messageText = message.text;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
-                    console.log(temperature);
-                    console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");
-                }
-            }); 
+            getWeatherToday(messageText);
         } else if(messageText.includes("!wtmrw")) {
-            var location = messageText.substring(messageText.indexOf(" ")+1);
-            getWeatherTomorrow(location);
-            
+            getWeatherTomorrow(messageText);          
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -139,11 +124,64 @@ function receivedMessage(event) {
 }
 
 /*
+ * Attempts to get the weather today from the location requested by the user.
+ */ 
+function getWeatherToday(messageText) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+        if(error) {
+            console.log("Error:", error);
+        } else if(response.statusCode !== 200) {
+            console.log("Status:", response.statusCode);
+        } else {
+            var temperature = Math.round(Number.parseFloat(data.main.temp)); 
+            console.log(temperature);
+            console.log(data.name);
+            sendTextMessage(senderID, temperature.toString() + "°C");
+        }
+    }); 
+}
+
+/*
+ * Attempts to get the weather tomorrow from the location requested by the user.
+ */
+async function getWeatherTomorrow(messageText) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    await request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+        if(error) {
+            console.log("Error:", error);
+        } else if(response.statusCode !== 200) {
+            console.log("Status:", response.statusCode);
+        } else {
+            var index = await getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+            console.log("index in else if = ", index);
+            if(index !== -1) {
+                console.log(index);
+                var maxTemp = -100; 
+                for(var i = 0; i < 8; i++) {
+                    var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                    console.log("Index+i = ", searchIndex);
+                    if(data.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = data.list[searchIndex].main.temp;
+                        console.log(data.list[searchIndex].main.temp);
+                    }
+                }
+                maxTemp = Math.round(maxTemp); 
+                console.log(maxTemp);
+                sendTextMessage(senderID, maxTemp.toString() + "°C");
+            } else {
+                sendTextMessage(senderID, "Could not find weather");
+            }
+        }
+    }); 
+}
+
+/*
  * Returns the array index number to get temperatures of the next day.
  */
-async function getForecastArrayIndex(lat, long) {
+function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
-    await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
+    request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
         if(error) {
             console.log("Error:", error);
@@ -173,35 +211,6 @@ async function getForecastArrayIndex(lat, long) {
     return arrayIndex;
 }
 
-async function getWeatherTomorrow(location) {
-    request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
-        if(error) {
-            console.log("Error:", error);
-        } else if(response.statusCode !== 200) {
-            console.log("Status:", response.statusCode);
-        } else {
-            var index = await getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
-            console.log("index in else if = ", index);
-            if(index !== -1) {
-                console.log(index);
-                var maxTemp = -100; 
-                for(var i = 0; i < 8; i++) {
-                    var searchIndex = Number.parseInt(index) + Number.parseInt(i);
-                    console.log("Index+i = ", searchIndex);
-                    if(data.list[searchIndex].main.temp > maxTemp) {
-                        maxTemp = data.list[searchIndex].main.temp;
-                        console.log(data.list[searchIndex].main.temp);
-                    }
-                }
-                maxTemp = Math.round(maxTemp); 
-                console.log(maxTemp);
-                sendTextMessage(senderID, maxTemp.toString() + "°C");
-            } else {
-                sendTextMessage(senderID, "Could not find weather");
-            }
-        }
-    }); 
-}
 /*
  * Send a text message using the Send API.
  *
