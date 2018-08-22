@@ -114,9 +114,9 @@ function receivedMessage(event) {
     var messageText = message.text;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            getWeatherToday(messageText);
+            getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
-            getWeatherTomorrow(messageText);          
+            getWeatherTomorrow(messageText, senderID);          
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -126,7 +126,7 @@ function receivedMessage(event) {
 /*
  * Attempts to get the weather today from the location requested by the user.
  */ 
-async function getWeatherToday(messageText) {
+async function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
@@ -145,7 +145,7 @@ async function getWeatherToday(messageText) {
 /*
  * Attempts to get the weather tomorrow from the location requested by the user.
  */
-async function getWeatherTomorrow(messageText) {
+async function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     await request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
