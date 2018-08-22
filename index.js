@@ -181,7 +181,7 @@ async function getWeatherTomorrow(messageText, senderID) {
  */
 async function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
-    request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
+    await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
         if(error) {
             console.log("Error:", error);
