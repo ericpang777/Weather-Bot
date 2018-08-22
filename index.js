@@ -174,13 +174,13 @@ async function getForecastArrayIndex(lat, long) {
 }
 
 async function getWeatherTomorrow(location) {
-    await request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+    request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+            var index = await getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
             console.log("index in else if = ", index);
             if(index !== -1) {
                 console.log(index);
