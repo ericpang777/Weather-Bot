@@ -145,15 +145,15 @@ async function getWeatherToday(messageText, senderID) {
 /*
  * Attempts to get the weather tomorrow from the location requested by the user.
  */
-async function getWeatherTomorrow(messageText, senderID) {
+function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
-    await request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
+    request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
         } else if(response.statusCode !== 200) {
             console.log("Status:", response.statusCode);
         } else {
-            var index = await getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
+            var index = getForecastArrayIndex(data.city.coord.lat, data.city.coord.lon);
             console.log("index in else if = ", index);
             if(index !== -1) {
                 console.log(index);
