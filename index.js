@@ -126,7 +126,7 @@ function receivedMessage(event) {
 /*
  * Attempts to get the weather today from the location requested by the user.
  */ 
-function getWeatherToday(messageText) {
+async function getWeatherToday(messageText) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
