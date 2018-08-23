@@ -168,7 +168,7 @@ function getWeatherTomorrow(messageText, senderID) {
             var lat = weatherData.city.coord.lat;
             console.log(lat);
             var long = weatherData.city.coord.lng;
-            console.log(long);
+            console.log(lng);
             return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
         })
         .then(response => {
