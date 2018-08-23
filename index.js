@@ -137,7 +137,7 @@ function getWeatherToday(messageText, senderID) {
         })
         .catch(error => {
             console.log("Weather Today Error: ", error);
-            sendTextMessage(senderID, "Could not find weather");
+            sendTextMessage(senderID, "Could not find weather, make sure you send the message as !wtoday city,2 letter country code(optional)");
         });
 }
 
@@ -194,7 +194,7 @@ function getWeatherTomorrow(messageText, senderID) {
         })
         .catch(error => {
             console.log("Weather Tmrw Error: ", error);
-            sendTextMessage(senderID, "Could not find weather");
+            sendTextMessage(senderID, "Could not find weather, make sure you send the message as !wtmrw city,2 letter country code(optional)");
         });
 }
 
