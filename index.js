@@ -130,9 +130,9 @@ function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
         .then(response =>{
-            var temperature = Math.round(Number.parseFloat(data.main.temp)); 
+            var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
             console.log(temperature);
-            console.log(data.name);
+            console.log(response.data.name);
             sendTextMessage(senderID, temperature.toString() + "°C");
         })
         .catch(error => {
