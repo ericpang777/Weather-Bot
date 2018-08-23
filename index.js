@@ -1,9 +1,10 @@
 'use strict';
 
 const
+    axios = require('axios'),
+    body_parser = require('body-parser'),
     express = require('express'),
     request = require('request'),
-    body_parser = require('body-parser'),
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -17,7 +18,6 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 // App Secret can be retrieved from the App Dashboard
 const APP_SECRET = process.env.MESSENGER_APP_SECRET;
-
 // Arbitrary value used to validate a webhook
 const VALIDATION_TOKEN = process.env.MESSENGER_VALIDATION_TOKEN;
 
@@ -28,8 +28,10 @@ const PAGE_ACCESS_TOKEN = process.env.MESSENGER_PAGE_ACCESS_TOKEN;
 // assets located at this address.
 const SERVER_URL = process.env.SERVER_URL;
 
-const API_KEY = process.env.OPEN_WEATHER_API_KEY;
-const API_URL = "http://api.openweathermap.org/data/2.5/";
+const WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/";
+const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
+const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
@@ -51,7 +53,6 @@ app.get('/webhook', function (req, res) {
         res.sendStatus(403);
     }
 });
-
 
 /*
  * All callbacks for Messenger are POST-ed. They will be sent to the same
@@ -113,25 +114,88 @@ function receivedMessage(event) {
     var messageText = message.text;
     if (messageText) {
         if(messageText.includes("!wtoday")) {
-            var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((API_URL+"weather?q="+location+"&appid="+API_KEY), {json: true}, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    var temperature = Math.round(Number.parseFloat(data.main.temp) - 273.15);
-                    console.log(temperature);
-                    console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");
-                }
-            }); 
+            getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
-            sendTextMessage(senderID, "Weather Tomorrow");
+            getWeatherTomorrow(messageText, senderID);          
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
+}
+
+/*
+ * Attempts to get the weather today from the location requested by the user.
+ */ 
+function getWeatherToday(messageText, senderID) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response => {
+            var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
+            console.log("Temperature Today: ", temperature);
+            console.log("Location Today: ", response.data.name);
+            sendTextMessage(senderID, temperature.toString() + "°C");
+        })
+        .catch(error => {
+            console.log("Weather Today Error: ", error);
+            sendTextMessage(senderID, "Could not find weather");
+        });
+}
+
+/*
+ * Attempts to get the weather tomorrow from the location requested by the user.
+ */
+function getWeatherTomorrow(messageText, senderID) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    var weatherData;
+    var timeData;
+    var arrayIndex = -1;
+
+    axios.get(WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response => {
+            weatherData = response.data;
+            var lat = weatherData.city.coord.lat;
+            var long = weatherData.city.coord.lon;
+            console.log("Latitude Tmrw: ", lat);
+            console.log("Longitude Tmrw: ", long);
+            console.log("Location Tmrw:", weatherData.city.name);
+            //Find the current time in that city
+            return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
+        })
+        .then(response => {
+            timeData = response.data;
+
+            //Finds the array index to start searching tomorrow's temperatures in terms of 3 hour segments.
+            var cityTime = new Date(timeData.timestamp * 1000);
+            console.log("City Time: ", cityTime);
+            var cityTimeTmrw = new Date(timeData.timestamp * 1000);
+            cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log("City Midnight Time: ", midnightTime);
+            var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            var hoursToMidnight = timeToMidnight / (1000*60*60);
+            arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log("Array Index: ", arrayIndex);  
+
+            //Find highest temperature of the next day
+            if(arrayIndex !== -1) {
+                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
+                for(var i = 0; i < 8; i++) {
+                    var searchIndex = arrayIndex + i;
+                    if(weatherData.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = weatherData.list[searchIndex].main.temp;
+                    }
+                }
+                maxTemp = Math.round(maxTemp); 
+                console.log("Max Temperature: ", maxTemp);
+                sendTextMessage(senderID, maxTemp.toString() + "°C");
+            } else {
+                sendTextMessage(senderID, "Could not find weather");
+            }
+        })
+        .catch(error => {
+            console.log("Weather Tmrw Error: ", error);
+            sendTextMessage(senderID, "Could not find weather");
+        });
 }
 
 /*
