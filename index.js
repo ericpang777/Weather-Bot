@@ -158,19 +158,44 @@ function getWeatherToday(messageText, senderID) {
  */
 function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
+    var weatherData;
+    var timeData;
+    var arrayIndex = -1;
+
     axios.get(WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
         .then(response => {
-            var index = getForecastArrayIndex(response.data.city.coord.lat, response.data.city.coord.lon);
-            console.log("index in else if = ", index);
-            if(index !== -1) {
-                console.log(index);
+            weatherData = response.data;
+            var lat = weatherData.city.coord.lat;
+            var long = weatherData.city.coord.long;
+            return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
+        })
+        .then(response => {
+            timeData = response.data;
+            var cityTime = new Date(timeData.timestamp * 1000);
+            console.log(cityTime);
+            var cityTimeTmrw = new Date(timeData.timestamp * 1000);
+            console.log(cityTimeTmrw);
+            cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            console.log(cityTimeTmrw);
+            var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log(midnightTime);
+            var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            console.log(timeToMidnight);
+            var hoursToMidnight = timeToMidnight / (1000*60*60);
+            console.log(hoursToMidnight);
+            arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log(arrayIndex);  
+
+            console.log("index in else if = ", arrayIndex);
+            if(arrayIndex !== -1) {
+                console.log(arrayIndex);
                 var maxTemp = -100; 
                 for(var i = 0; i < 8; i++) {
-                    var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                    var searchIndex = index +i;
                     console.log("Index+i = ", searchIndex);
-                    if(response.data.list[searchIndex].main.temp > maxTemp) {
-                        maxTemp = response.data.list[searchIndex].main.temp;
-                        console.log(response.data.list[searchIndex].main.temp);
+                    if(weatherData.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = weatherData.list[searchIndex].main.temp;
+                        console.log(weatherData.list[searchIndex].main.temp);
                     }
                 }
                 maxTemp = Math.round(maxTemp); 
@@ -216,6 +241,7 @@ function getWeatherTomorrow(messageText, senderID) {
 /*
  * Returns the array index number to get temperatures of the next day.
  */
+/*
 function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
     axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long)
@@ -239,7 +265,7 @@ function getForecastArrayIndex(lat, long) {
         .catch(error => {
             console.log(error);
         });
-    /*
+    
     await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
         if(error) {
@@ -265,10 +291,10 @@ function getForecastArrayIndex(lat, long) {
             arrayIndex = Math.floor(hoursToMidnight / 3);
             console.log(arrayIndex);        
         }
-    }); */
+    }); 
     console.log("arrayIndex = ", arrayIndex);
     return arrayIndex;
-}
+}*/
 
 /*
  * Send a text message using the Send API.
