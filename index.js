@@ -137,6 +137,7 @@ function getWeatherToday(messageText, senderID) {
         })
         .catch(error => {
             console.log("Weather Today Error: ", error);
+            sendTextMessage(senderID, "Could not find weather");
         });
 }
 
@@ -157,10 +158,13 @@ function getWeatherTomorrow(messageText, senderID) {
             console.log("Latitude Tmrw: ", lat);
             console.log("Longitude Tmrw: ", long);
             console.log("Location Tmrw:", weatherData.city.name);
+            //Find the current time in that city
             return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
         })
         .then(response => {
             timeData = response.data;
+
+            //Finds the array index to start searching tomorrow's temperatures in terms of 3 hour segments.
             var cityTime = new Date(timeData.timestamp * 1000);
             console.log("City Time: ", cityTime);
             var cityTimeTmrw = new Date(timeData.timestamp * 1000);
@@ -172,8 +176,9 @@ function getWeatherTomorrow(messageText, senderID) {
             arrayIndex = Math.floor(hoursToMidnight / 3);
             console.log("Array Index: ", arrayIndex);  
 
+            //Find highest temperature of the next day
             if(arrayIndex !== -1) {
-                var maxTemp = -100; 
+                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
                 for(var i = 0; i < 8; i++) {
                     var searchIndex = arrayIndex + i;
                     if(weatherData.list[searchIndex].main.temp > maxTemp) {
@@ -189,6 +194,7 @@ function getWeatherTomorrow(messageText, senderID) {
         })
         .catch(error => {
             console.log("Weather Tmrw Error: ", error);
+            sendTextMessage(senderID, "Could not find weather");
         });
 }
 
