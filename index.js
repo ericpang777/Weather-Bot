@@ -166,7 +166,9 @@ function getWeatherTomorrow(messageText, senderID) {
         .then(response => {
             weatherData = response.data;
             var lat = weatherData.city.coord.lat;
+            console.log(lat);
             var long = weatherData.city.coord.long;
+            console.log(long);
             return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
         })
         .then(response => {
@@ -191,7 +193,7 @@ function getWeatherTomorrow(messageText, senderID) {
                 console.log(arrayIndex);
                 var maxTemp = -100; 
                 for(var i = 0; i < 8; i++) {
-                    var searchIndex = index +i;
+                    var searchIndex = arrayIndex + i;
                     console.log("Index+i = ", searchIndex);
                     if(weatherData.list[searchIndex].main.temp > maxTemp) {
                         maxTemp = weatherData.list[searchIndex].main.temp;
