@@ -1,9 +1,10 @@
 'use strict';
 
 const
+    axios = require('axios'),
+    body_parser = require('body-parser'),
     express = require('express'),
     request = require('request'),
-    body_parser = require('body-parser'),
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -17,7 +18,6 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 // App Secret can be retrieved from the App Dashboard
 const APP_SECRET = process.env.MESSENGER_APP_SECRET;
-
 // Arbitrary value used to validate a webhook
 const VALIDATION_TOKEN = process.env.MESSENGER_VALIDATION_TOKEN;
 
@@ -128,6 +128,17 @@ function receivedMessage(event) {
  */ 
 function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
+    axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response =>{
+            var temperature = Math.round(Number.parseFloat(data.main.temp)); 
+            console.log(temperature);
+            console.log(data.name);
+            sendTextMessage(senderID, temperature.toString() + "°C");
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    /*
     request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
         if(error) {
             console.log("Error:", error);
@@ -139,14 +150,15 @@ function getWeatherToday(messageText, senderID) {
             console.log(data.name);
             sendTextMessage(senderID, temperature.toString() + "°C");
         }
-    }); 
+    }); */
 }
 
 /*
  * Attempts to get the weather tomorrow from the location requested by the user.
  */
-async function getWeatherTomorrow(messageText, senderID) {
+function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
+    /*
     request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, async(error, response, data) => {
         if(error) {
             console.log("Error:", error);
@@ -173,14 +185,15 @@ async function getWeatherTomorrow(messageText, senderID) {
                 sendTextMessage(senderID, "Could not find weather");
             }
         }
-    }); 
+    }); */
 }
 
 /*
  * Returns the array index number to get temperatures of the next day.
  */
-async function getForecastArrayIndex(lat, long) {
+function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
+    /*
     await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
         if(error) {
@@ -206,7 +219,7 @@ async function getForecastArrayIndex(lat, long) {
             arrayIndex = Math.floor(hoursToMidnight / 3);
             console.log(arrayIndex);        
         }
-    }); 
+    }); */
     console.log("arrayIndex = ", arrayIndex);
     return arrayIndex;
 }
