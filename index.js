@@ -129,7 +129,7 @@ function receivedMessage(event) {
 function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
-        .then(response =>{
+        .then(response => {
             var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
             console.log(temperature);
             console.log(response.data.name);
@@ -158,6 +158,31 @@ function getWeatherToday(messageText, senderID) {
  */
 function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
+    axios.get(WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response => {
+            var index = getForecastArrayIndex(response.data.city.coord.lat, response.data.city.coord.lon);
+            console.log("index in else if = ", index);
+            if(index !== -1) {
+                console.log(index);
+                var maxTemp = -100; 
+                for(var i = 0; i < 8; i++) {
+                    var searchIndex = Number.parseInt(index) + Number.parseInt(i);
+                    console.log("Index+i = ", searchIndex);
+                    if(response.data.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = response.data.list[searchIndex].main.temp;
+                        console.log(response.data.list[searchIndex].main.temp);
+                    }
+                }
+                maxTemp = Math.round(maxTemp); 
+                console.log(maxTemp);
+                sendTextMessage(senderID, maxTemp.toString() + "°C");
+            } else {
+                sendTextMessage(senderID, "Could not find weather");
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
     /*
     request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, async(error, response, data) => {
         if(error) {
@@ -193,6 +218,27 @@ function getWeatherTomorrow(messageText, senderID) {
  */
 function getForecastArrayIndex(lat, long) {
     var arrayIndex = -1;
+    axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long)
+        .then(response => {
+            console.log("Fetching timezone api");
+            var cityTime = new Date(response.data.timestamp * 1000);
+            console.log(cityTime);
+            var cityTimeTmrw = new Date(response.data.timestamp * 1000);
+            console.log(cityTimeTmrw);
+            cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            console.log(cityTimeTmrw);
+            var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log(midnightTime);
+            var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            console.log(timeToMidnight);
+            var hoursToMidnight = timeToMidnight / (1000*60*60);
+            console.log(hoursToMidnight);
+            arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log(arrayIndex);  
+        })
+        .catch(error => {
+            console.log(error);
+        });
     /*
     await request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
         console.log("in request");
