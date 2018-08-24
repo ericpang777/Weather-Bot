@@ -157,6 +157,7 @@ function receivedPostback(event) {
     var payload = event.postback.payload;
 
     var location = event.message.text;
+    console.log(location);
 
     console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
@@ -278,6 +279,7 @@ function sendTextMessage(recipientId, messageText) {
  */
 function sendWeather(recipientId, messageText) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
+    console.log(location);
     var messageData = {
         recipient: {id: recipientId},
         message: {
