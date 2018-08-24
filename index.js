@@ -33,7 +33,7 @@ const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
 const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
 
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && WEATHER_API_KEY && TIMEZONE_API_KEY)) {
     console.error("Missing config values");
     process.exit(1);
 }
