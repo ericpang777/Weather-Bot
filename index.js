@@ -124,6 +124,8 @@ var senderID = event.sender.id;
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
+        } else if(messageText.toUpperCase() === "GET STARTED") {
+            sendGetStarted(senderID);
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -159,7 +161,7 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-            getWeatherToday("!wtoday toronto", senderID);
+          getWeatherToday("!wtoday toronto", senderID);
           break;
         case 'w_tomorrow':
           getWeatherTomorrow("!wtmrw toronto" , senderID);
@@ -176,10 +178,17 @@ function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
         .then(response => {
-            var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
+            var location = response.data.name + ", " + response.data.sys.country;
+            var temperature = Math.round(Number.parseFloat(response.data.main.temp));
+            var cast = response.data.weather[0].main;
+            var condition = response.data.weather[0].description;
+            var humidity = Math.round(Number.parseFloat(response.data.main.humidity));
+            var wind = Math.round(Number.parseFloat(response.data.wind.speed));
             console.log("Temperature Today: ", temperature);
             console.log("Location Today: ", response.data.name);
-            sendTextMessage(senderID, temperature.toString() + "°C");
+            sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
+                                "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+                                "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
         })
         .catch(error => {
             console.log("Weather Today Error: ", error);
@@ -231,9 +240,10 @@ function getWeatherTomorrow(messageText, senderID) {
                         maxTemp = weatherData.list[searchIndex].main.temp;
                     }
                 }
-                maxTemp = Math.round(maxTemp); 
+                var location = weatherData.city.name + ", " + weatherData.city.country;
+                maxTemp = Math.round(maxTemp);
                 console.log("Max Temperature: ", maxTemp);
-                sendTextMessage(senderID, maxTemp.toString() + "°C");
+                sendTextMessage(senderID, location + "\n" + "Daytime high: " + maxTemp.toString() + "°C");
             } else {
                 sendTextMessage(senderID, "Could not find weather");
             }
