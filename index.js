@@ -124,8 +124,8 @@ var senderID = event.sender.id;
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
-        } else if(messageText.toUpperCase() === "GET STARTED") {
-            sendGetStarted(senderID);
+        } else if(messageText.includes("weather")) {
+            sendWeather(senderID, messageText.substring(messageText.indexOf(" ")+1));
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -156,15 +156,17 @@ function receivedPostback(event) {
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
+    var location = event.message.text;
+
     console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
     
     switch(payload){
         case 'w_today':
-          getWeatherToday("!wtoday toronto", senderID);
+          getWeatherToday("!wtoday " + location, senderID);
           break;
         case 'w_tomorrow':
-          getWeatherTomorrow("!wtmrw toronto" , senderID);
+          getWeatherTomorrow("!wtmrw " + location, senderID);
           break;
         default:
           sendTextMessage(senderID, "Postback called");
@@ -180,14 +182,13 @@ function getWeatherToday(messageText, senderID) {
         .then(response => {
             var location = response.data.name + ", " + response.data.sys.country;
             var temperature = Math.round(Number.parseFloat(response.data.main.temp));
-            var cast = response.data.weather[0].main;
             var condition = response.data.weather[0].description;
             var humidity = Math.round(Number.parseFloat(response.data.main.humidity));
             var wind = Math.round(Number.parseFloat(response.data.wind.speed));
             console.log("Temperature Today: ", temperature);
             console.log("Location Today: ", response.data.name);
             sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
-                                "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+                                "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
                                 "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
         })
         .catch(error => {
@@ -275,12 +276,13 @@ function sendTextMessage(recipientId, messageText) {
  * Get started menu message
  * Sends postback requests to webhook
  */
-function sendGetStarted(recipientId) {
+function sendWeather(recipientId, location) {
     var messageData = {
         recipient: {
             id: recipientId
         },
         message: {
+            text: location,
             attachment: {
                 type: "template",
                 payload: {
