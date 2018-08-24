@@ -125,7 +125,7 @@ var senderID = event.sender.id;
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
         } else if(messageText.includes("weather")) {
-            sendWeather(senderID, messageText.substring(messageText.indexOf(" ")+1));
+            sendWeather(senderID, messageText);
         } else {
             sendTextMessage(senderID, messageText);
         } 
@@ -163,10 +163,10 @@ function receivedPostback(event) {
     
     switch(payload){
         case 'w_today':
-          getWeatherToday("!wtoday " + location, senderID);
+          getWeatherToday("!wtoday " + location.toString(), senderID);
           break;
         case 'w_tomorrow':
-          getWeatherTomorrow("!wtmrw " + location, senderID);
+          getWeatherTomorrow("!wtmrw " + location.toString(), senderID);
           break;
         default:
           sendTextMessage(senderID, "Postback called");
@@ -276,11 +276,10 @@ function sendTextMessage(recipientId, messageText) {
  * Get started menu message
  * Sends postback requests to webhook
  */
-function sendWeather(recipientId, location) {
+function sendWeather(recipientId, messageText) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
     var messageData = {
-        recipient: {
-            id: recipientId
-        },
+        recipient: {id: recipientId},
         message: {
             text: location,
             attachment: {
