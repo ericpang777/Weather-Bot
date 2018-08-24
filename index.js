@@ -1,9 +1,10 @@
 'use strict';
 // Imports dependencies and sets up http server
 const
+    axios = require('axios'),
+    body_parser = require('body-parser'),
     express = require('express'),
     request = require('request'),
-    body_parser = require('body-parser'),
     app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -17,7 +18,6 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 // App Secret can be retrieved from the App Dashboard
 const APP_SECRET = process.env.MESSENGER_APP_SECRET;
-
 // Arbitrary value used to validate a webhook
 const VALIDATION_TOKEN = process.env.MESSENGER_VALIDATION_TOKEN;
 
@@ -76,7 +76,7 @@ app.post('/webhook', function (req, res) {
                 if (messagingEvent.message) {
                     receivedMessage(messagingEvent);
                 } else if (messagingEvent.postback) {
-                    receivedMessage(messagingEvent);
+                    receivedPostback(messagingEvent);
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
@@ -117,90 +117,24 @@ var senderID = event.sender.id;
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
+    var postback = message.postback;
     //Can't we just do if(message.text)?
     if (messageText) {
-        if(messageText.includes("!wtoday") || messageText.includes("Weather Today")) {
-            var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    var location = data.name + ", " + data.sys.country;
-                    var temperature = Math.round(Number.parseFloat(data.main.temp));
-                    var cast = data.weather[0].main;
-                    var condition = data.weather[0].description;
-                    var humidity = Math.round(Number.parseFloat(data.main.humidity));
-                    var wind = Math.round(Number.parseFloat(data.wind.speed));
-
-                    console.log(temperature);
-                    console.log(cast);
-                    console.log(condition);
-                    console.log(humidity);
-                    console.log(wind);
-                    console.log(location);
-
-                    sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
-                                    "\n" + cast + "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
-                                    "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
-                    
-                    //var apiDat = [condition.charAt(0).toUpperCase() + condition.substr(1), temperature + "°C", hhumidity.toString() + "%", wind.toString() + " km/h"];
-                    //sendWeather(senderID, apiDat);
-                }
-            }); 
+        if(messageText.includes("!wtoday")) {
+            getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
-            var location = messageText.substring(messageText.indexOf(" ")+1);
-            request((WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric"), {json: true}, (error, response, data) => {
-                if(error) {
-                    console.log("Error:", error);
-                } else if(response.statusCode !== 200) {
-                    console.log("Status:", response.statusCode);
-                } else {
-                    getAfternoonTime(data.city.coord.lat, data.city.coord.lon);
-                    /*
-                    var temperature = Math.round(Number.parseFloat(data.main.temp)); 
-                    console.log(temperature);
-                    console.log(data.name);
-                    sendTextMessage(senderID, temperature.toString() + "°C");*/
-                }
-            }); 
-            sendTextMessage(senderID, "Weather Tomorrow");
-        } 
-        else if (messageText.includes("get started")){
-            sendGetStarted(senderID);
+            getWeatherTomorrow(messageText, senderID);          
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
-    /**else if (message.attachment) {
-        let attachment_url;
-        response = {
-            "attachment": {
-                "type": "template",
-                "payload": {
-                    "template_type": "generic",
-                    "elements": [{
-                        "title": "Title",
-                        "subtitle": "Subtitle",
-                        "image_url": attachment_url,
-                        "buttons": [
-                            {
-                                "type": "postback",
-                                "title": "Yes!",
-                                "payload": "yes",
-                            },
-                            {
-                                "type": "postback",
-                                "title": "No!",
-                                "payload": "no",
-                            },
-                        ]
-                    }]
-                }
-            }
-        }
-    }**/
+    else if(postback){
+        console.log("Recieved postback event");
+        receivedPostback(event);
+    }
+    else {
+        console.log("Undefined message contents");
+    }
     //Send the response message
     callSendAPI(message);
 }
@@ -220,39 +154,94 @@ function receivedPostback(event) {
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
-    console.log("Received postback for user %d and page %d with payload '%s' " + "at %d", 
+    console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
     
     switch(payload){
         case 'w_today':
-          sendTextMessage(senderID, "Current weather");
+            getWeatherToday("!wtoday toronto", senderID);
           break;
         case 'w_tomorrow':
-          sendTextMessage(senderID, "Weather Tomorrow");
+          getWeatherTomorrow("!wtmrw toronto" , senderID);
           break;
         default:
           sendTextMessage(senderID, "Postback called");
     }
 }
  /* Returns the number of 3 hour segments there are from current time to 2pm the next day.
+ * Returns the array index number to get temperatures of the next day.
+ * Attempts to get the weather today from the location requested by the user.
+ */ 
+function getWeatherToday(messageText, senderID) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response => {
+            var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
+            console.log("Temperature Today: ", temperature);
+            console.log("Location Today: ", response.data.name);
+            sendTextMessage(senderID, temperature.toString() + "°C");
+        })
+        .catch(error => {
+            console.log("Weather Today Error: ", error);
+            sendTextMessage(senderID, "Could not find weather, make sure you send the message as !wtoday city,2 letter country code(optional)");
+        });
+}
+
+/*
+ * Attempts to get the weather tomorrow from the location requested by the user.
  */
-function getAfternoonTime(lat, long) {
-    request((TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long), {json: true}, (error, response, data) => {
-        if(error) {
-            console.log("Error:", error);
-        } else if(response.statusCode !== 200) {
-            console.log("Status:", response.statusCode);
-        } else {
-            var cityTime = new Date(data.timestamp);
-            var cityTimeTmrw = new Date();
-            cityTimeTmrw.setDate(cityTime.getDate());
-            console.log(data.timestamp);
-            console.log(cityTime);
-            cityTimeTmrw.setDate(cityTime.getDate() + 1);
-            console.log(cityTime);
-            console.log(cityTimeTmrw);
-        }
-    }); 
+function getWeatherTomorrow(messageText, senderID) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    var weatherData;
+    var timeData;
+    var arrayIndex = -1;
+
+    axios.get(WEATHER_API_URL+"forecast?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
+        .then(response => {
+            weatherData = response.data;
+            var lat = weatherData.city.coord.lat;
+            var long = weatherData.city.coord.lon;
+            console.log("Latitude Tmrw: ", lat);
+            console.log("Longitude Tmrw: ", long);
+            console.log("Location Tmrw:", weatherData.city.name);
+            //Find the current time in that city
+            return axios.get(TIMEZONE_API_URL+TIMEZONE_API_KEY+"&format=json&by=position&lat="+lat+"&lng="+long);
+        })
+        .then(response => {
+            timeData = response.data;
+
+            //Finds the array index to start searching tomorrow's temperatures in terms of 3 hour segments.
+            var cityTime = new Date(timeData.timestamp * 1000);
+            console.log("City Time: ", cityTime);
+            var cityTimeTmrw = new Date(timeData.timestamp * 1000);
+            cityTimeTmrw.setDate(cityTimeTmrw.getDate() + 1);
+            var midnightTime = new Date(cityTimeTmrw.getFullYear(), cityTimeTmrw.getMonth(), cityTimeTmrw.getDate(), 0, 0 ,0);
+            console.log("City Midnight Time: ", midnightTime);
+            var timeToMidnight = midnightTime.getTime() - cityTime.getTime();
+            var hoursToMidnight = timeToMidnight / (1000*60*60);
+            arrayIndex = Math.floor(hoursToMidnight / 3);
+            console.log("Array Index: ", arrayIndex);  
+
+            //Find highest temperature of the next day
+            if(arrayIndex !== -1) {
+                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
+                for(var i = 0; i < 8; i++) {
+                    var searchIndex = arrayIndex + i;
+                    if(weatherData.list[searchIndex].main.temp > maxTemp) {
+                        maxTemp = weatherData.list[searchIndex].main.temp;
+                    }
+                }
+                maxTemp = Math.round(maxTemp); 
+                console.log("Max Temperature: ", maxTemp);
+                sendTextMessage(senderID, maxTemp.toString() + "°C");
+            } else {
+                sendTextMessage(senderID, "Could not find weather");
+            }
+        })
+        .catch(error => {
+            console.log("Weather Tmrw Error: ", error);
+            sendTextMessage(senderID, "Could not find weather, make sure you send the message as !wtmrw city,2 letter country code(optional)");
+        });
 }
 
 /*
@@ -273,8 +262,8 @@ function sendTextMessage(recipientId, messageText) {
 }
 
 /*
- * Send a button message using the Send API.
- *
+ * Get started menu message
+ * Sends postback requests to webhook
  */
 function sendGetStarted(recipientId) {
     var messageData = {
@@ -301,34 +290,6 @@ function sendGetStarted(recipientId) {
         }
     };
   callSendAPI(messageData);
-}
-
-function sendWeather(recipientID, temperature){
-    var messageData = {
-        recipient: {
-            id: recipientID
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "list",
-                    top_element_style: "compact",
-                    elements: [
-                        {
-                            title: "Temperature",
-                            subtitle: temperature,
-                        },
-                        {
-                            title: "Precipitation"
-
-                        }
-                    ]
-                }
-            }
-        }
-    };
-    callSendAPI(messageData);
 }
 
 /*
