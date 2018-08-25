@@ -105,7 +105,7 @@ app.post('/webhook', function (req, res) {
  *
  */
 function receivedMessage(event) {
-var senderID = event.sender.id;
+    var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfMessage = event.timestamp;
     var message = event.message;
@@ -124,16 +124,16 @@ var senderID = event.sender.id;
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
-        } else if(messageText.includes("weather")) {
+        } else if(messageText.includes("weather") || messageText.includes("Weather")) {
             sendWeather(senderID, messageText);
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
-    else if(postback){
-        console.log("Recieved postback event");
-        receivedPostback(event);
-    }
+    // else if(postback){
+    //     console.log("Recieved postback event");
+    //     receivedPostback(event);
+    // }
     else {
         console.log("Undefined message contents");
     }
@@ -156,21 +156,20 @@ function receivedPostback(event) {
     var timeOfPostback = event.timestamp;
     var payload = event.postback.payload;
 
-    var location = event.message.text;
-    console.log(location);
+    var location = payload.substring(payload.indexOf(" ")+1);
+    console.log("Location: " + location);
 
     console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
     
-    switch(payload){
-        case 'w_today':
-          getWeatherToday("!wtoday " + location.toString(), senderID);
-          break;
-        case 'w_tomorrow':
-          getWeatherTomorrow("!wtmrw " + location.toString(), senderID);
-          break;
-        default:
-          sendTextMessage(senderID, "Postback called");
+    if (payload.includes("w_today")){
+        getWeatherToday("!wtoday" + " " + location.toString(), senderID);
+    }
+    else if (payload.includes("w_tomorrow")){
+        getWeatherTomorrow("!wtmrw" + " " + location.toString(), senderID);
+    }
+    else {
+        console.log("Postback called");
     }
 }
  /* Returns the number of 3 hour segments there are from current time to 2pm the next day.
@@ -279,11 +278,9 @@ function sendTextMessage(recipientId, messageText) {
  */
 function sendWeather(recipientId, messageText) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
-    console.log(location);
     var messageData = {
         recipient: {id: recipientId},
         message: {
-            text: location,
             attachment: {
                 type: "template",
                 payload: {
@@ -292,11 +289,11 @@ function sendWeather(recipientId, messageText) {
                     buttons: [{
                         type: "postback",
                         title: "Weather Today",
-                        payload: "w_today"
+                        payload: "w_today" + " " + location
                     }, {
                         type: "postback",
                         title: "Weather Tomorrow",
-                        payload: "w_tomorrow"
+                        payload: "w_tomorrow" + " " + location
                     }]
                 }
             }
