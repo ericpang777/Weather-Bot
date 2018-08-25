@@ -8,7 +8,7 @@ const WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/";
 const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
 const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
-const prefix = process.env.prefix;
+const prefix = process.env.PREFIX;
 
 /*
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && WEATHER_API_KEY && TIMEZONE_API_KEY)) {
