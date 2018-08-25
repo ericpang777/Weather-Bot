@@ -8,13 +8,17 @@ Facebook messenger bot used to check weather forecasts
 ## Greeting Message
 - [ ] Welcome Page
 - [ ] Route get started postback
-- [ ] Echoe get started
+- [ ] Fix postbacks from get started
 
 ## Location based weather results
 - [ ] Retrieve location data
 
 ## Return Weather
-- [ ] Display in list form
+- [ ] Display in image format
+- [x] Add other weather information
+- [ ] Retrieve icons from weather api
+
+## Webhook Events
+- [ ] message_postbacks
 - [ ] message_echoes
-- [ ] Add other weather information
-- [ ] Icons/images based on report
+- [ ] Response to user scroll to bottom
