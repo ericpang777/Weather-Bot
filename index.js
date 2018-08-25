@@ -1,4 +1,5 @@
 'use strict';
+
 // Imports dependencies and sets up http server
 const
     axios = require('axios'),
@@ -34,7 +35,7 @@ const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
 const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
 
 
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && WEATHER_API_KEY && TIMEZONE_API_KEY)) {
     console.error("Missing config values");
     process.exit(1);
 }
@@ -110,8 +111,6 @@ function receivedMessage(event) {
     var timeOfMessage = event.timestamp;
     var message = event.message;
 
-    var requestURL = "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=7dcd47e7d9822e605a5ee663d66c2135";
-
     console.log("Received message for user %d and page %d at %d with message:",
         senderID, recipientID, timeOfMessage);
     console.log(JSON.stringify(message));
@@ -164,8 +163,8 @@ function receivedPostback(event) {
         console.log("Postback called");
     }
 }
- /* Returns the number of 3 hour segments there are from current time to 2pm the next day.
- * Returns the array index number to get temperatures of the next day.
+
+ /* 
  * Attempts to get the weather today from the location requested by the user.
  */ 
 function getWeatherToday(messageText, senderID) {
@@ -191,6 +190,7 @@ function getWeatherToday(messageText, senderID) {
 
 /*
  * Attempts to get the weather tomorrow from the location requested by the user.
+ * Uses the highest temperature of next day.
  */
 function getWeatherTomorrow(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
