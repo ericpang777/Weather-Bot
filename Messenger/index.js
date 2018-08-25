@@ -1,5 +1,5 @@
 'use strict';
-
+// Imports dependencies and sets up http server
 const
     axios = require('axios'),
     body_parser = require('body-parser'),
@@ -11,7 +11,7 @@ const
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 /*
- * Be sure to setup your config values before running this code. You can
+ * Setup of configuration variables. You can
  * set them using environment variables or modifying the config file in /config.
  *
  */
@@ -33,7 +33,8 @@ const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const TIMEZONE_API_URL = "http://api.timezonedb.com/v2/get-time-zone?key=";
 const TIMEZONE_API_KEY = process.env.TIMEZONEDB_API_KEY;
 
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && WEATHER_API_KEY && TIMEZONE_API_KEY)) {
+
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
     console.error("Missing config values");
     process.exit(1);
 }
@@ -59,7 +60,8 @@ app.get('/webhook', function (req, res) {
  * webhook. Be sure to subscribe your app to your page to receive callbacks
  * for your page.
  * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
- *
+ * 
+ * Accepts POST requests at /webhook endpoint
  */
 app.post('/webhook', function (req, res) {
     var data = req.body;
@@ -73,12 +75,13 @@ app.post('/webhook', function (req, res) {
             pageEntry.messaging.forEach(function (messagingEvent) {
                 if (messagingEvent.message) {
                     receivedMessage(messagingEvent);
+                } else if (messagingEvent.postback) {
+                    receivedPostback(messagingEvent);
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
             });
         });
-
         // Assume all went well.
         //
         // You must send back a 200, within 20 seconds, to let us know you've
@@ -112,28 +115,71 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
+    
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
+        } else if(messageText.toUpperCase().includes("WEATHER")) {
+            sendWeather(senderID, messageText);
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
+    else {
+        console.log("Undefined message contents");
+    }
+    //Send the response message
+    callSendAPI(message);
 }
 
 /*
+ * Postback Event
+ *
+ * This event is called when a postback is tapped on a Structured Message.
+ * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
+ * 
+ * Returns weather based on input from get started menu
+ *
+ */
+function receivedPostback(event) {
+    var senderID = event.sender.id;
+    var recipientID = event.recipient.id;
+    var timeOfPostback = event.timestamp;
+    var payload = event.postback.payload;
+
+    var location = payload.substring(payload.indexOf(" ")+1);
+
+    console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
+    senderID, recipientID, payload, timeOfPostback);
+    
+    if (payload.includes("w_today")){
+        getWeatherToday("!wtoday" + " " + location.toString(), senderID);
+    } else if (payload.includes("w_tomorrow")){
+        getWeatherTomorrow("!wtmrw" + " " + location.toString(), senderID);
+    } else {
+        console.log("Postback called");
+    }
+}
+ /* Returns the number of 3 hour segments there are from current time to 2pm the next day.
+ * Returns the array index number to get temperatures of the next day.
  * Attempts to get the weather today from the location requested by the user.
  */ 
 function getWeatherToday(messageText, senderID) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
     axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
         .then(response => {
-            var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
+            var location = response.data.name + ", " + response.data.sys.country;
+            var temperature = Math.round(Number.parseFloat(response.data.main.temp));
+            var condition = response.data.weather[0].description;
+            var humidity = Math.round(Number.parseFloat(response.data.main.humidity));
+            var wind = Math.round(Number.parseFloat(response.data.wind.speed));
             console.log("Temperature Today: ", temperature);
             console.log("Location Today: ", response.data.name);
-            sendTextMessage(senderID, temperature.toString() + "°C");
+            sendTextMessage(senderID, location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
+                                "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+                                "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
         })
         .catch(error => {
             console.log("Weather Today Error: ", error);
@@ -178,16 +224,30 @@ function getWeatherTomorrow(messageText, senderID) {
 
             //Find highest temperature of the next day
             if(arrayIndex !== -1) {
-                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
+                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about
+                var maxIndex; 
                 for(var i = 0; i < 8; i++) {
                     var searchIndex = arrayIndex + i;
                     if(weatherData.list[searchIndex].main.temp > maxTemp) {
                         maxTemp = weatherData.list[searchIndex].main.temp;
+                        maxIndex = searchIndex;
                     }
                 }
-                maxTemp = Math.round(maxTemp); 
+                var location = weatherData.city.name + ", " + weatherData.city.country;
+                maxTemp = Math.round(maxTemp);
+                var main = weatherData.list[maxIndex].weather[0].main;
+                var condition = weatherData.list[maxIndex].weather[0].description;
+                var rain = 0;
+                var humidity = weatherData.list[maxIndex].main.humidity;
+                var wind = Math.round(weatherData.list[maxIndex].wind.speed);
+                     if(main.toString().toLowerCase().includes("rain")){
+                         rain = weatherData.list[maxIndex].rain["3h"];
+                         Number.parseFloat(rain.toFixed(1));
+                     }
                 console.log("Max Temperature: ", maxTemp);
-                sendTextMessage(senderID, maxTemp.toString() + "°C");
+                sendTextMessage(senderID, location + "\n" + "Daytime high: " + maxTemp.toString() + "°C" + "\n" 
+                                + condition.charAt(0).toUpperCase() + condition.substr(1) + "\n" + "Precipitation: " + rain.toString() + " mm"
+                                + "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind speed: " + wind.toString() + " km/h");
             } else {
                 sendTextMessage(senderID, "Could not find weather");
             }
@@ -216,11 +276,33 @@ function sendTextMessage(recipientId, messageText) {
 }
 
 /*
- * Send a button message using the Send API.
- *
+ * Sends button template message with forecasts
+ * Location is passed on through payload attribute of message attachement
  */
-function sendGetStarted(recipientId) {
-
+function sendWeather(recipientId, messageText) {
+    var location = messageText.substring(messageText.indexOf(" ")+1);
+    var messageData = {
+        recipient: {id: recipientId},
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "button",
+                    text: "Hi, I'm Weather Bot! Tap a forecast to view more information.",
+                    buttons: [{
+                        type: "postback",
+                        title: "Weather Today",
+                        payload: "w_today" + " " + location
+                    }, {
+                        type: "postback",
+                        title: "Weather Tomorrow",
+                        payload: "w_tomorrow" + " " + location
+                    }]
+                }
+            }
+        }
+    };
+  callSendAPI(messageData);
 }
 
 /*
