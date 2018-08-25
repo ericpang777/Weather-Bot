@@ -224,17 +224,30 @@ function getWeatherTomorrow(messageText, senderID) {
 
             //Find highest temperature of the next day
             if(arrayIndex !== -1) {
-                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
+                var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about
+                var maxIndex; 
                 for(var i = 0; i < 8; i++) {
                     var searchIndex = arrayIndex + i;
                     if(weatherData.list[searchIndex].main.temp > maxTemp) {
                         maxTemp = weatherData.list[searchIndex].main.temp;
+                        maxIndex = searchIndex;
                     }
                 }
                 var location = weatherData.city.name + ", " + weatherData.city.country;
                 maxTemp = Math.round(maxTemp);
+                var main = weatherData.list[maxIndex].weather[0].main;
+                var condition = weatherData.list[maxIndex].weather[0].description;
+                var rain = 0;
+                var humidity = weatherData.list[maxIndex].main.humidity;
+                var wind = Math.round(weatherData.list[maxIndex].wind.speed);
+                     if(main.toString().toLowerCase().includes("rain")){
+                         rain = weatherData.list[maxIndex].rain["3h"];
+                         Number.parseFloat(rain.toFixed(1));
+                     }
                 console.log("Max Temperature: ", maxTemp);
-                sendTextMessage(senderID, location + "\n" + "Daytime high: " + maxTemp.toString() + "°C");
+                sendTextMessage(senderID, location + "\n" + "Daytime high: " + maxTemp.toString() + "°C" + "\n" 
+                                + condition.charAt(0).toUpperCase() + condition.substr(1) + "\n" + "Precipitation: " + rain.toString() + " mm"
+                                + "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind speed: " + wind.toString() + " km/h");
             } else {
                 sendTextMessage(senderID, "Could not find weather");
             }
