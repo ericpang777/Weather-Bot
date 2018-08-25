@@ -117,23 +117,18 @@ function receivedMessage(event) {
     console.log(JSON.stringify(message));
 
     var messageText = message.text;
-    var postback = message.postback;
-    //Can't we just do if(message.text)?
+    
     if (messageText) {
         if(messageText.includes("!wtoday")) {
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
             getWeatherTomorrow(messageText, senderID);          
-        } else if(messageText.includes("weather") || messageText.includes("Weather")) {
+        } else if(messageText.toUpperCase().includes("WEATHER")) {
             sendWeather(senderID, messageText);
         } else {
             sendTextMessage(senderID, messageText);
         } 
     }
-    // else if(postback){
-    //     console.log("Recieved postback event");
-    //     receivedPostback(event);
-    // }
     else {
         console.log("Undefined message contents");
     }
@@ -157,18 +152,15 @@ function receivedPostback(event) {
     var payload = event.postback.payload;
 
     var location = payload.substring(payload.indexOf(" ")+1);
-    console.log("Location: " + location);
 
     console.log("Received postback for user %d and page %d with payload '%d' " + "at %d", 
     senderID, recipientID, payload, timeOfPostback);
     
     if (payload.includes("w_today")){
         getWeatherToday("!wtoday" + " " + location.toString(), senderID);
-    }
-    else if (payload.includes("w_tomorrow")){
+    } else if (payload.includes("w_tomorrow")){
         getWeatherTomorrow("!wtmrw" + " " + location.toString(), senderID);
-    }
-    else {
+    } else {
         console.log("Postback called");
     }
 }
@@ -273,8 +265,8 @@ function sendTextMessage(recipientId, messageText) {
 }
 
 /*
- * Get started menu message
- * Sends postback requests to webhook
+ * Sends button template message with forecasts
+ * Location is passed on through payload attribute of message attachement
  */
 function sendWeather(recipientId, messageText) {
     var location = messageText.substring(messageText.indexOf(" ")+1);
