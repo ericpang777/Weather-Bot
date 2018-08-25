@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "publishheroku": "cd ../ && git subtree push --prefix Messenger weather-bot-56517 master || true"
   },
   "author": "",
   "license": "ISC",
