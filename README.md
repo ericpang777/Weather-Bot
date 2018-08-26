@@ -1,5 +1,7 @@
 # Weather Bot
-Facebook messenger bot used to check weather forecasts
+Facebook Messenger and Discord bot used to check weather forecasts.
+Messenger bot hosted on Heroku.
+Discord bot hosted on Glitch.
 
 ## TODO
 - [ ] Greeting Message
