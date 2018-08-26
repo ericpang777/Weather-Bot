@@ -34,10 +34,16 @@ function getWeatherToday(message) {
     var location = message.content.substring(message.content.indexOf(" ")+1);
     axios.get(WEATHER_API_URL+"weather?q="+location+"&appid="+WEATHER_API_KEY+"&units=metric")
         .then(response => {
+            var location = response.data.name + ", " + response.data.sys.country;
             var temperature = Math.round(Number.parseFloat(response.data.main.temp)); 
+            var condition = response.data.weather[0].description;
+            var humidity = Math.round(Number.parseFloat(response.data.main.humidity));
+            var wind = Math.round(Number.parseFloat(response.data.wind.speed));
             console.log("Temperature Today: ", temperature);
             console.log("Location Today: ", response.data.name);
-            message.channel.send(temperature.toString() + "°C");
+            message.channel.send(location + "\n" + "Current temperature: " + temperature.toString() + "°C" + 
+            "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) +
+            "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
         })
         .catch(error => {
             console.log("Weather Today Error: ", error);
@@ -83,15 +89,29 @@ function getWeatherTomorrow(message) {
             //Find highest temperature of the next day
             if(arrayIndex !== -1) {
                 var maxTemp = -100; //If the temperature is lower than this, there's bigger problems to worry about 
+                var maxIndex;
                 for(var i = 0; i < 8; i++) {
                     var searchIndex = arrayIndex + i;
                     if(weatherData.list[searchIndex].main.temp > maxTemp) {
                         maxTemp = weatherData.list[searchIndex].main.temp;
+                        maxIndex = searchIndex;
                     }
                 }
+                var location = weatherData.city.name + ", " + weatherData.city.country;
                 maxTemp = Math.round(maxTemp); 
+                var main = weatherData.list[maxIndex].weather[0].main;
+                var condition = weatherData.list[maxIndex].weather[0].description;
+                var rain = 0;
+                var humidity = weatherData.list[maxIndex].main.humidity;
+                var wind = Math.round(weatherData.list[maxIndex].wind.speed);
+                if(main.toString().toLowerCase().startsWith("rain")){
+                    rain = weatherData.list[maxIndex].rain["3h"];
+                    Number.parseFloat(rain.toFixed(1));
+                }
                 console.log("Max Temperature: ", maxTemp);
-                message.channel.send(maxTemp.toString() + "°C");
+                message.channel.send(location + "\n" + "Daytime high: " + maxTemp.toString() + "°C" + 
+                "\n" + condition.charAt(0).toUpperCase() + condition.substr(1) + "\n" + "Precipitation: " + rain.toString() + " mm" +
+                "\n" + "Humidity: " + humidity.toString() + "%" + "\n" + "Wind Speed: " + wind.toString() + " km/h");
             } else {
                 message.channel.send("Could not find weather");
             }
