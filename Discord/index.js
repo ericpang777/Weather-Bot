@@ -3,6 +3,7 @@ const client = new Discord.Client();
 
 const axios = require("axios");
 const express = require("express");
+const http = require('http');
 const app = express();
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
@@ -17,7 +18,15 @@ if (!(DISCORD_TOKEN && WEATHER_API_KEY && TIMEZONE_API_KEY && prefix)) {
     process.exit(1);
 }
 
+app.get("/", (request, response) => {
+    console.log(Date.now() + " Ping Received");
+    response.sendStatus(200);
+});
+
 app.listen(process.env.PORT || 5000);
+setInterval(() => {
+    http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
 
 client.on("message", (message) => {
     // Exit and stop if the prefix is not there or if user is a bot

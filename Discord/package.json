@@ -1,17 +1,28 @@
 {
   "name": "discord",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "publishheroku": "cd ../ && git subtree push --prefix Discord discord master || true"
+    "publishheroku": "cd ../ && git subtree push --prefix Discord weather-bot-56518 master || true"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
-    "discord.js": "^11.4.2"
-  }
+    "discord.js": "^11.4.2",
+    "express": "^4.16.3",
+    "http": "0.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericpang777/WeatherBotDiscord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ericpang777/WeatherBotDiscord/issues"
+  },
+  "homepage": "https://github.com/ericpang777/WeatherBotDiscord#readme",
+  "description": ""
 }
