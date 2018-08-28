@@ -120,7 +120,9 @@ function receivedMessage(event) {
         if(messageText.includes("!wtoday")) {
             getWeatherToday(messageText, senderID);
         } else if(messageText.includes("!wtmrw")) {
-            getWeatherTomorrow(messageText, senderID);          
+            getWeatherTomorrow(messageText, senderID);
+        } else if (messageText.includes("!wtomorrow")) {
+            getWeatherTomorrow(messageText, senderID);
         } else if(messageText.toUpperCase().includes("WEATHER")) {
             sendWeather(senderID, messageText);
         } else {
@@ -242,7 +244,10 @@ function getWeatherTomorrow(messageText, senderID) {
                 var wind = Math.round(weatherData.list[maxIndex].wind.speed);
                      if(main.toString().toLowerCase().includes("rain")){
                          rain = weatherData.list[maxIndex].rain["3h"];
-                         Number.parseFloat(rain.toFixed(1));
+                         rain = Math.round(rain * 10) / 10;
+                         if(rain === 0) {
+                             rain = "~0";
+                         }
                      }
                 console.log("Max Temperature: ", maxTemp);
                 sendTextMessage(senderID, location + "\n" + "Daytime high: " + maxTemp.toString() + "°C" + "\n" 

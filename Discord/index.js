@@ -36,6 +36,8 @@ client.on("message", (message) => {
         getWeatherToday(message);
     } else if(message.content.startsWith(prefix + "wtmrw")) {
         getWeatherTomorrow(message);
+    } else if(message.content.startsWith(prefix + "wtomorrow")) {
+        getWeatherTomorrow(message);
     }
 });
 
@@ -118,7 +120,10 @@ function getWeatherTomorrow(message) {
                 var wind = Math.round(weatherData.list[maxIndex].wind.speed);
                 if(main.toString().toLowerCase().startsWith("rain")){
                     rain = weatherData.list[maxIndex].rain["3h"];
-                    Number.parseFloat(rain.toFixed(1));
+                    rain = Math.round(rain * 10) / 10;
+                        if(rain === 0) {
+                            rain = "~0";
+                        }
                 }
                 console.log("Max Temperature: ", maxTemp);
                 message.channel.send(location + "\n" + "Daytime high: " + maxTemp.toString() + "°C" + 
