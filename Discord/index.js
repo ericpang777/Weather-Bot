@@ -38,6 +38,8 @@ client.on("message", (message) => {
         getWeatherTomorrow(message);
     } else if(message.content.startsWith(prefix + "wtomorrow")) {
         getWeatherTomorrow(message);
+    } else if(message.content.startsWith(prefix + "whelp")) {
+        message.channel.send("**COMMANDS:**\n!wtoday *city,country*(optional)\n!wtmrw *city,country*(optional)\n!wtomorrow *city,country*(optional)\nUse 2 letter country code");
     }
 });
 
